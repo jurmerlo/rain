@@ -1,0 +1,15 @@
+{
+  "name": "@rainengein/rain-monorepo",
+  "private": true,
+  "description": "",
+  "scripts": {
+    "lint": "biome check"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.20.0",
+  "devDependencies": {
+    "@biomejs/biome": "2.3.3"
+  }
+}
