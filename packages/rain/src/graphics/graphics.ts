@@ -1,6 +1,7 @@
 import { Mat4 } from '../math/mat4.js';
 import type { Rectangle } from '../math/rectangle.js';
 import type { Vec2 } from '../math/vec2.js';
+import type { View } from '../view/view.js';
 import type { BitmapFont } from './bitmapFont.js';
 import { Color } from './color.js';
 import type { GLContext } from './glContext.js';
@@ -35,14 +36,11 @@ export class Graphics {
 
   private context: GLContext;
 
-  private canvas: HTMLCanvasElement;
+  private view: View;
 
-  private pixelRatio: number;
-
-  constructor(context: GLContext, canvas: HTMLCanvasElement, pixelRatio: number) {
+  constructor(context: GLContext, view: View) {
     this.context = context;
-    this.canvas = canvas;
-    this.pixelRatio = pixelRatio;
+    this.view = view;
 
     this.projection = new Mat4();
     this.transformStack.push(new Mat4());
@@ -115,8 +113,8 @@ export class Graphics {
       width = target.width;
       height = target.height;
     } else {
-      width = this.canvas.width * this.pixelRatio;
-      height = this.canvas.height * this.pixelRatio;
+      width = this.view.canvasWidth;
+      height = this.view.canvasHeight;
     }
 
     this.projection.ortho(0, width, height, 0, -1, 1);

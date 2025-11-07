@@ -7,14 +7,19 @@ import { Audio } from './audio/audio.js';
 import { addService } from './di/services.js';
 import { GLContext } from './graphics/glContext.js';
 import { Graphics } from './graphics/graphics.js';
+import { RenderTarget } from './graphics/renderTarget.js';
 import { Input } from './input/input.js';
 import { clamp } from './math/mathUtils.js';
 import { Random } from './math/random.js';
-import { Callbacks } from './utils/callbacks.js';
+import { Vec2 } from './math/vec2.js';
+import { type StateClass, States } from './states/states.js';
+import { View } from './view/view.js';
 
 export type RainOptions = {
-  width: number;
-  height: number;
+  designWidth: number;
+  designHeight: number;
+  canvasWidth?: number;
+  canvasHeight?: number;
   title?: string;
   targetFps?: number;
   runInBackground?: boolean;
@@ -25,16 +30,6 @@ export type RainOptions = {
 const MAX_DT: number = 1.0 / 15;
 
 export class Rain {
-  readonly canvas: HTMLCanvasElement;
-
-  readonly pixelRatio: number;
-
-  readonly callbacks: Callbacks;
-
-  fillWindow: boolean;
-
-  targetFps: number;
-
   private input: Input;
 
   private runInBackground: boolean;
@@ -49,51 +44,74 @@ export class Rain {
 
   private inFocus: boolean;
 
-  constructor({ width, height, title, targetFps, runInBackground, hdpi, fillWindow }: RainOptions) {
+  private states: States;
+
+  private view: View;
+
+  private target: RenderTarget;
+
+  constructor({
+    designWidth,
+    designHeight,
+    canvasWidth,
+    canvasHeight,
+    title,
+    targetFps,
+    runInBackground,
+    hdpi,
+    fillWindow,
+  }: RainOptions) {
     title ??= 'Rain Game';
+    canvasWidth ??= designWidth;
+    canvasHeight ??= designHeight;
     this.runInBackground = runInBackground ?? false;
-    this.targetFps = targetFps ?? -1;
+    targetFps ??= -1;
     hdpi ??= false;
-    this.fillWindow = fillWindow ?? false;
-    if (this.fillWindow) {
-      width = window.innerWidth;
-      height = window.innerHeight;
+    fillWindow ??= false;
+    if (fillWindow) {
+      canvasWidth = window.innerWidth;
+      canvasHeight = window.innerHeight;
     }
 
     document.title = title;
     const canvasId = 'rain';
 
-    this.pixelRatio = hdpi ? window.devicePixelRatio : 1;
-    this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
+    const pixelRatio = hdpi ? window.devicePixelRatio : 1;
+    const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
 
-    if (!this.canvas) {
+    if (!canvas) {
       throw new Error(`Canvas element with id "${canvasId}" not found`);
     }
 
-    this.canvas.width = width * this.pixelRatio;
-    this.canvas.height = height * this.pixelRatio;
+    canvas.width = canvasWidth * pixelRatio;
+    canvas.height = canvasHeight * pixelRatio;
 
-    this.canvas.style.width = `${width}px`;
-    this.canvas.style.height = `${height}px`;
+    canvas.style.width = `${canvasWidth}px`;
+    canvas.style.height = `${canvasHeight}px`;
 
-    this.context = new GLContext(this.canvas);
+    this.view = new View({ designWidth, designHeight, fillWindow, pixelRatio, canvas, targetFps });
+    addService('view', this.view);
+
+    this.target = new RenderTarget(this.view.viewWidth, this.view.viewHeight);
+
+    this.context = new GLContext(canvas);
     addService('glContext', this.context);
 
     addService('audio', new Audio());
 
-    this.graphics = new Graphics(this.context, this.canvas, this.pixelRatio);
+    this.graphics = new Graphics(this.context, this.view);
     addService('graphics', this.graphics);
 
     addService('random', new Random());
 
-    this.input = new Input(this.canvas);
+    this.input = new Input(canvas);
     addService('input', this.input);
-
-    this.callbacks = new Callbacks(this.input);
-    addService('callbacks', this.callbacks);
 
     const assets = new Assets();
     addService('assets', assets);
+
+    this.states = new States();
+    addService('states', this.states);
 
     assets.registerLoader(new BitmapFontLoader());
     assets.registerLoader(new ImageLoader());
@@ -105,19 +123,20 @@ export class Rain {
     this.inFocus = false;
   }
 
-  start(): void {
+  start(startState: StateClass): void {
     if (this.started) {
       throw new Error('Rain is already started');
     }
     this.started = true;
 
-    this.canvas.focus();
+    this.view.canvas.focus();
     this.inFocus = true;
 
-    this.canvas.addEventListener('focus', () => this.focus());
-    this.canvas.addEventListener('blur', () => this.blur());
-    this.canvas.addEventListener('resize', () => this.resize(window.innerWidth, window.innerHeight));
+    this.view.canvas.addEventListener('focus', () => this.focus());
+    this.view.canvas.addEventListener('blur', () => this.blur());
+    this.view.canvas.addEventListener('resize', () => this.resize(window.innerWidth, window.innerHeight));
 
+    this.states.changeTo(startState);
     requestAnimationFrame(() => {
       this.lastFrameTime = window.performance.now();
       this.loop();
@@ -126,16 +145,22 @@ export class Rain {
 
   focus(): void {
     this.inFocus = true;
-    this.callbacks.focus();
+    this.states.focus();
   }
 
   blur(): void {
     this.inFocus = false;
-    this.callbacks.blur();
+    this.states.blur();
   }
 
   resize(width: number, height: number): void {
-    this.callbacks.resize(width, height);
+    if (this.view.fillWindow) {
+      this.view.canvas.style.width = `${width}px`;
+      this.view.canvas.style.height = `${height}px`;
+      this.view.scaleToFit();
+      this.target = new RenderTarget(this.view.viewWidth, this.view.viewHeight);
+    }
+    this.states.resize(width, height);
   }
 
   private loop(): void {
@@ -143,11 +168,11 @@ export class Rain {
 
     const now = window.performance.now();
     const timePassed = now - this.lastFrameTime;
-    if (this.targetFps === -1) {
+    if (this.view.targetFps === -1) {
       this.update(timePassed / 1000.0);
       this.lastFrameTime = now;
     } else {
-      const interval = 1.0 / this.targetFps;
+      const interval = 1.0 / this.view.targetFps;
       if (timePassed < interval) {
         return;
       }
@@ -165,12 +190,25 @@ export class Rain {
 
     const clampedDt = clamp(deltaTime, 0, MAX_DT);
     this.input.update();
+    this.states.update(clampedDt);
 
-    this.callbacks.update(clampedDt);
-    this.render();
+    this.draw();
   }
 
-  private render(): void {
-    this.callbacks.render(this.graphics);
+  private draw(): void {
+    const graphics = this.graphics;
+    graphics.transform.identity();
+
+    graphics.pushTarget(this.target);
+    this.states.draw(graphics);
+    graphics.popTarget();
+
+    graphics.transform.identity();
+    graphics.color.set(1, 1, 1, 1);
+
+    const pos = Vec2.get(this.view.viewOffsetX, this.view.viewOffsetY);
+    graphics.start();
+    graphics.drawRenderTarget(pos, this.target);
+    graphics.commit();
   }
 }
