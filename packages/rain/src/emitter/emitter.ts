@@ -7,16 +7,6 @@ export type EmitHandler = {
   active: boolean;
 };
 
-export type EmitterOnParams<
-  // biome-ignore lint/suspicious/noExplicitAny: Generic type T can be any object with string keys and array values.
-  T extends Record<string, any[]>,
-  K extends keyof T,
-> = {
-  event: K;
-  callback: (...event: T[K]) => void;
-  filter?: (...event: T[K]) => boolean;
-};
-
 /**
  * Class representing an event emitter.
  */
@@ -30,7 +20,11 @@ export class Emitter<T extends Record<string, any[]>> {
    * @param params - The event parameters.
    * @returns The registered event handler.
    */
-  on<K extends keyof T>({ event, callback, filter }: EmitterOnParams<T, K>): EmitHandler {
+  on<K extends keyof T>(
+    event: K,
+    callback: (...event: T[K]) => void,
+    filter?: (...event: T[K]) => boolean,
+  ): EmitHandler {
     if (!this.handlers[event]) {
       this.handlers[event] = [];
     }

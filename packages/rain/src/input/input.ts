@@ -1,4 +1,4 @@
-import { type EmitHandler, Emitter, type EmitterOnParams } from '../emitter/emitter.js';
+import { type EmitHandler, Emitter } from '../emitter/emitter.js';
 import { getKeyCodeFromString, type KeyCode } from './keyCode.js';
 
 export type GamepadState = {
@@ -9,7 +9,6 @@ export type GamepadState = {
 type InputEvents = {
   keyPressed: [keyCode: (typeof KeyCode)[keyof typeof KeyCode], code: string, key: string];
   keyReleased: [keyCode: (typeof KeyCode)[keyof typeof KeyCode], code: string, key: string];
-  keyPress: [keyCode: (typeof KeyCode)[keyof typeof KeyCode], code: string, key: string];
   mousePressed: [button: number, x: number, y: number];
   mouseReleased: [button: number, x: number, y: number];
   mouseMoved: [x: number, y: number, dx: number, dy: number];
@@ -43,8 +42,12 @@ export class Input {
    * @param params - The parameters for the event listener.
    * @returns The handler for the event listener.
    */
-  on<K extends keyof InputEvents>(params: EmitterOnParams<InputEvents, K>): EmitHandler {
-    return this.emitter.on(params);
+  on<K extends keyof InputEvents>(
+    event: K,
+    callback: (...event: InputEvents[K]) => void,
+    filter?: (...event: InputEvents[K]) => boolean,
+  ): EmitHandler {
+    return this.emitter.on(event, callback, filter);
   }
 
   /**
@@ -102,7 +105,6 @@ export class Input {
   private addListeners(): void {
     this.canvas.addEventListener('keydown', this.onKeyDown);
     this.canvas.addEventListener('keyup', this.onKeyUp);
-    this.canvas.addEventListener('keypress', this.onKeyPress);
 
     this.canvas.addEventListener('mousedown', this.onMouseDown);
     this.canvas.addEventListener('mouseup', this.onMouseUp);
@@ -124,7 +126,6 @@ export class Input {
   private removeListeners(): void {
     this.canvas.removeEventListener('keydown', this.onKeyDown);
     this.canvas.removeEventListener('keyup', this.onKeyUp);
-    this.canvas.removeEventListener('keypress', this.onKeyPress);
 
     this.canvas.removeEventListener('mousedown', this.onMouseDown);
     this.canvas.removeEventListener('mouseup', this.onMouseUp);
@@ -159,15 +160,6 @@ export class Input {
     const keyCode = getKeyCodeFromString(event.code);
 
     this.emitter.emit('keyReleased', keyCode, event.code, event.key);
-  };
-
-  private onKeyPress = (event: KeyboardEvent): void => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    const keyCode = getKeyCodeFromString(event.code);
-
-    this.emitter.emit('keyPress', keyCode, event.code, event.key);
   };
 
   private onMouseDown = (event: MouseEvent): void => {

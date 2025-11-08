@@ -12,7 +12,8 @@ import { RenderTarget } from './graphics/renderTarget.js';
 import { Input } from './input/input.js';
 import { clamp } from './math/mathUtils.js';
 import { Random } from './math/random.js';
-import { type StateClass, States } from './states/states.js';
+import { type StateClass, States } from './state/states.js';
+import { Time } from './utils/time.js';
 import { View } from './view/view.js';
 
 export type RainOptions = {
@@ -49,6 +50,8 @@ export class Rain {
   private view: View;
 
   private target: RenderTarget;
+
+  private time: Time;
 
   constructor({
     designWidth,
@@ -110,6 +113,9 @@ export class Rain {
 
     this.states = new States();
     addService('states', this.states);
+
+    this.time = new Time();
+    addService('time', this.time);
 
     assets.registerLoader(new AtlasLoader());
     assets.registerLoader(new BitmapFontLoader());
@@ -190,8 +196,9 @@ export class Rain {
     }
 
     const clampedDt = clamp(deltaTime, 0, MAX_DT);
+    this.time.update(clampedDt);
     this.input.update();
-    this.states.update(clampedDt);
+    this.states.update(this.time.dt);
 
     this.draw();
   }

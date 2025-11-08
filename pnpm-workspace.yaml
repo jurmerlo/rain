@@ -1,6 +1,8 @@
 packages:
   - packages/*
+  - projects/*
 
 catalog:
  typescript: "^5.9.3"
- vitest: "^4.0.6"
+ vite: "^7.1.7"
+ vitest: "^4.0.8"

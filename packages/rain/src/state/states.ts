@@ -1,5 +1,6 @@
 import type { Graphics } from '../graphics/graphics.js';
-import type { State } from './state.js';
+import { Camera } from '../view/camera.js';
+import { Entity } from './entities.js';
 
 export type StateClass = new () => State;
 
@@ -56,13 +57,43 @@ export class States {
   private changeState(): void {
     if (this.currentState) {
       this.currentState.destroy();
+      this.currentState = null;
     }
 
     if (this.nextState) {
       const state = new this.nextState();
       this.nextState = null;
-      state.create();
       this.currentState = state;
+    }
+  }
+}
+
+export class State extends Entity {
+  readonly cameras: Camera[] = [];
+
+  get mainCamera(): Camera | null {
+    return this.cameras.length > 0 ? this.cameras[0] : null;
+  }
+
+  constructor() {
+    super();
+    this.cameras.push(new Camera());
+  }
+
+  focus(): void {}
+
+  blur(): void {}
+
+  resize(_width: number, _height: number): void {
+    for (const camera of this.cameras) {
+      camera.resize();
+    }
+  }
+
+  override destroy(): void {
+    super.destroy();
+    for (const camera of this.cameras) {
+      camera.destroy();
     }
   }
 }
