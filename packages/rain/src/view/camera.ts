@@ -241,7 +241,7 @@ export class Camera {
       return;
     }
 
-    graphics.drawRenderTarget(this.screenPosition, this.target);
+    graphics.drawRenderTarget(this.screenPosition.x, this.screenPosition.y, this.target);
   }
 
   /**

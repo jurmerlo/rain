@@ -1,4 +1,5 @@
 import { Assets } from './assets/assets.js';
+import { AtlasLoader } from './assets/atlasLoader.js';
 import { BitmapFontLoader } from './assets/bitmapFontLoader.js';
 import { ImageLoader } from './assets/imageLoader.js';
 import { SoundLoader } from './assets/soundLoader.js';
@@ -11,7 +12,6 @@ import { RenderTarget } from './graphics/renderTarget.js';
 import { Input } from './input/input.js';
 import { clamp } from './math/mathUtils.js';
 import { Random } from './math/random.js';
-import { Vec2 } from './math/vec2.js';
 import { type StateClass, States } from './states/states.js';
 import { View } from './view/view.js';
 
@@ -92,8 +92,6 @@ export class Rain {
     this.view = new View({ designWidth, designHeight, fillWindow, pixelRatio, canvas, targetFps });
     addService('view', this.view);
 
-    this.target = new RenderTarget(this.view.viewWidth, this.view.viewHeight);
-
     this.context = new GLContext(canvas);
     addService('glContext', this.context);
 
@@ -113,10 +111,13 @@ export class Rain {
     this.states = new States();
     addService('states', this.states);
 
+    assets.registerLoader(new AtlasLoader());
     assets.registerLoader(new BitmapFontLoader());
     assets.registerLoader(new ImageLoader());
     assets.registerLoader(new SoundLoader());
     assets.registerLoader(new TextLoader());
+
+    this.target = new RenderTarget(this.view.viewWidth, this.view.viewHeight);
 
     this.started = false;
     this.lastFrameTime = 0;
@@ -134,7 +135,7 @@ export class Rain {
 
     this.view.canvas.addEventListener('focus', () => this.focus());
     this.view.canvas.addEventListener('blur', () => this.blur());
-    this.view.canvas.addEventListener('resize', () => this.resize(window.innerWidth, window.innerHeight));
+    window.addEventListener('resize', () => this.resize(window.innerWidth, window.innerHeight));
 
     this.states.changeTo(startState);
     requestAnimationFrame(() => {
@@ -206,9 +207,8 @@ export class Rain {
     graphics.transform.identity();
     graphics.color.set(1, 1, 1, 1);
 
-    const pos = Vec2.get(this.view.viewOffsetX, this.view.viewOffsetY);
     graphics.start();
-    graphics.drawRenderTarget(pos, this.target);
+    graphics.drawRenderTarget(this.view.viewOffsetX, this.view.viewOffsetY, this.target);
     graphics.commit();
   }
 }

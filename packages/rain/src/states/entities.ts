@@ -10,20 +10,20 @@ export class Entity {
     this.entities = new Entities();
   }
 
-  update(dt: number): void {
-    this.entities.update(dt);
-  }
-
-  draw(graphics: Graphics): void {
-    this.entities.draw(graphics);
-  }
-
   addEntity(entity: Entity): void {
     this.entities.add(entity);
   }
 
   removeEntity(entity: Entity): void {
     this.entities.remove(entity);
+  }
+
+  update(dt: number): void {
+    this.entities.update(dt);
+  }
+
+  draw(graphics: Graphics): void {
+    this.entities.draw(graphics);
   }
 
   destroy(): void {

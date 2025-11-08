@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/nursery/useMaxParams: Not passing objects to help performance. */
 import { Mat4 } from '../math/mat4.js';
 import type { Rectangle } from '../math/rectangle.js';
 import type { Vec2 } from '../math/vec2.js';
@@ -10,7 +11,7 @@ import { ImageRenderer } from './renderers/imageRenderer.js';
 import { ShapeRenderer } from './renderers/shapeRenderer.js';
 import type { RenderTarget } from './renderTarget.js';
 import type { Shader } from './shader.js';
-import type { Flip, LineAlign } from './types.js';
+import type { LineAlign } from './types.js';
 
 const MAX_TARGET_STACK = 64;
 const MAX_TRANSFORM_STACK = 128;
@@ -156,167 +157,186 @@ export class Graphics {
 
   /**
    * Draw a filled triangle.
-   * @param p1 - The first point of the triangle.
-   * @param p2 - The second point of the triangle.
-   * @param p3 - The third point of the triangle.
+   * @param p1X - The x-coordinate of the first point.
+   * @param p1Y - The y-coordinate of the first point.
+   * @param p2X - The x-coordinate of the second point.
+   * @param p2Y - The y-coordinate of the second point.
+   * @param p3X - The x-coordinate of the third point.
+   * @param p3Y - The y-coordinate of the third point.
    */
-  drawFilledTriangle(p1: Vec2, p2: Vec2, p3: Vec2): void {
+  drawFilledTriangle(p1X: number, p1Y: number, p2X: number, p2Y: number, p3X: number, p3Y: number): void {
     this.imageRenderer.commit();
     this.shapeRenderer.color = this.color;
     this.shapeRenderer.transform = this.transform;
-    this.shapeRenderer.drawFilledTriangle(p1, p2, p3);
+    this.shapeRenderer.drawFilledTriangle(p1X, p1Y, p2X, p2Y, p3X, p3Y);
   }
 
   /**
    * Draw a line.
-   * @param p1 - The first point of the line.
-   * @param p2 - The second point of the line.
+   * @param p1X - The x-coordinate of the first point.
+   * @param p1Y - The y-coordinate of the first point.
+   * @param p2X - The x-coordinate of the second point.
+   * @param p2Y - The y-coordinate of the second point.
    * @param align - The alignment of the line.
    * @param lineWidth - The width of the line.
    */
-  drawLine(p1: Vec2, p2: Vec2, align: LineAlign = 'center', lineWidth: number = 1): void {
+  drawLine(p1X: number, p1Y: number, p2X: number, p2Y: number, align: LineAlign, lineWidth: number): void {
     this.imageRenderer.commit();
     this.shapeRenderer.color = this.color;
     this.shapeRenderer.transform = this.transform;
-    this.shapeRenderer.drawLine(p1, p2, align, lineWidth);
+    this.shapeRenderer.drawLine(p1X, p1Y, p2X, p2Y, align, lineWidth);
   }
 
   /**
    * Draw a filled rectangle.
-   * @param rect - The rectangle to draw.
+   * @param x - The x-coordinate of the rectangle.
+   * @param y - The y-coordinate of the rectangle.
+   * @param width - The width of the rectangle.
+   * @param height - The height of the rectangle.
    */
-  drawFilledRect(rect: Rectangle): void {
+  drawFilledRect(x: number, y: number, width: number, height: number): void {
     this.imageRenderer.commit();
     this.shapeRenderer.color = this.color;
     this.shapeRenderer.transform = this.transform;
-    this.shapeRenderer.drawFilledRect(rect);
+    this.shapeRenderer.drawFilledRect(x, y, width, height);
   }
 
   /**
    * Draw a rectangle.
-   * @param rect - The rectangle to draw.
+   * @param x - The x-coordinate of the rectangle.
+   * @param y - The y-coordinate of the rectangle.
+   * @param width - The width of the rectangle.
+   * @param height - The height of the rectangle.
    * @param lineWidth - The width of the line.
    */
-  drawRect(rect: Rectangle, lineWidth: number = 1): void {
+  drawRect(x: number, y: number, width: number, height: number, lineWidth: number): void {
     this.imageRenderer.commit();
     this.shapeRenderer.color = this.color;
     this.shapeRenderer.transform = this.transform;
-    this.shapeRenderer.drawRect(rect, lineWidth);
+    this.shapeRenderer.drawRect(x, y, width, height, lineWidth);
   }
 
   /**
    * Draw a filled circle.
-   * @param center - The center of the circle.
+   * @param centerX - The x-coordinate of the center of the circle.
+   * @param centerY - The y-coordinate of the center of the circle.
    * @param radius - The radius of the circle.
    * @param segments - The number of segments in the circle.
    */
-  drawFilledCircle(center: Vec2, radius: number, segments: number = 32): void {
+  drawFilledCircle(centerX: number, centerY: number, radius: number, segments: number): void {
     this.imageRenderer.commit();
     this.shapeRenderer.color = this.color;
     this.shapeRenderer.transform = this.transform;
-    this.shapeRenderer.drawFilledCircle(center, radius, segments);
+    this.shapeRenderer.drawFilledCircle(centerX, centerY, radius, segments);
   }
 
   /**
    * Draw a circle.
-   * @param center - The center of the circle.
+   * @param centerX - The x-coordinate of the center of the circle.
+   * @param centerY - The y-coordinate of the center of the circle.
    * @param radius - The radius of the circle.
    * @param segments - The number of segments in the circle.
    * @param lineWidth - The width of the line.
    */
-  drawCircle(center: Vec2, radius: number, segments: number = 32, lineWidth: number = 1): void {
+  drawCircle(centerX: number, centerY: number, radius: number, segments: number, lineWidth: number): void {
     this.imageRenderer.commit();
     this.shapeRenderer.color = this.color;
     this.shapeRenderer.transform = this.transform;
-    this.shapeRenderer.drawCircle(center, radius, segments, lineWidth);
+    this.shapeRenderer.drawCircle(centerX, centerY, radius, segments, lineWidth);
   }
 
   /**
    * Draw a filled polygon.
-   * @param center - The center of the polygon.
+   * @param centerX - The x-coordinate of the center of the circle.
+   * @param centerY - The y-coordinate of the center of the circle.
    * @param vertices - The vertices of the polygon.
    */
-  drawFilledPolygon(center: Vec2, vertices: Vec2[]): void {
+  drawFilledPolygon(centerX: number, centerY: number, vertices: Vec2[]): void {
     this.imageRenderer.commit();
     this.shapeRenderer.color = this.color;
     this.shapeRenderer.transform = this.transform;
-    this.shapeRenderer.drawFilledPolygon(center, vertices);
+    this.shapeRenderer.drawFilledPolygon(centerX, centerY, vertices);
   }
 
   /**
    * Draw a polygon.
-   * @param center - The center of the polygon.
+   * @param centerX - The x-coordinate of the center of the circle.
+   * @param centerY - The y-coordinate of the center of the circle.
    * @param vertices - The vertices of the polygon.
    * @param lineWidth - The width of the line.
    */
-  drawPolygon(center: Vec2, vertices: Vec2[], lineWidth: number = 1): void {
+  drawPolygon(centerX: number, centerY: number, vertices: Vec2[], lineWidth: number): void {
     this.imageRenderer.commit();
     this.shapeRenderer.color = this.color;
     this.shapeRenderer.transform = this.transform;
-    this.shapeRenderer.drawPolygon(center, vertices, lineWidth);
+    this.shapeRenderer.drawPolygon(centerX, centerY, vertices, lineWidth);
   }
 
   /**
    * Draw an image to the screen.
+   * @param x - The x-coordinate to draw the image at.
+   * @param y - The y-coordinate to draw the image at.
    * @param image - The image to draw.
-   * @param position - The position to draw the image at.
-   * @param flip - Should the image be flipped.
    * @param frame - Optional region of the image to draw. Defaults to the full image.
-   * @param size - Optional size to scale the image to. Defaults to the image size.
    */
-
-  // biome-ignore lint/nursery/useMaxParams: This will get called often and should be optimized for performance.
-  drawImage(image: Image, position: Vec2, flip: Flip, frame?: Rectangle, size?: Vec2): void {
+  drawImage(x: number, y: number, image: Image, frame?: Rectangle): void {
     this.shapeRenderer.commit();
     this.imageRenderer.color = this.color;
     this.imageRenderer.transform = this.transform;
-    this.imageRenderer.drawImage(image, position, flip, frame, size);
+    this.imageRenderer.drawImage(x, y, image, frame);
   }
 
   /**
    * Draws an image on the canvas using the specified corner points.
+   * @param tlX - The x-coordinate of the top-left corner.
+   * @param tlY - The y-coordinate of the top-left corner.
+   * @param trX - The x-coordinate of the top-right corner.
+   * @param trY - The y-coordinate of the top-right corner.
+   * @param brX - The x-coordinate of the bottom-right corner.
+   * @param brY - The y-coordinate of the bottom-right corner.
+   * @param blX - The x-coordinate of the bottom-left corner.
+   * @param blY - The y-coordinate of the bottom-left corner.
    * @param image - The image to draw.
-   * @param topLeft - The top-left corner point.
-   * @param topRight - The top-right corner point.
-   * @param bottomRight - The bottom-right corner point.
-   * @param bottomLeft - The bottom-left corner point.
    * @param frame - Optional region of the image to draw. Defaults to the full image.
    */
-
-  // biome-ignore lint/nursery/useMaxParams: This will get called often and should be optimized for performance.
   drawImagePoints(
+    tlX: number,
+    tlY: number,
+    trX: number,
+    trY: number,
+    brX: number,
+    brY: number,
+    blX: number,
+    blY: number,
     image: Image,
-    topLeft: Vec2,
-    topRight: Vec2,
-    bottomRight: Vec2,
-    bottomLeft: Vec2,
     frame?: Rectangle,
   ): void {
     this.shapeRenderer.commit();
     this.imageRenderer.color = this.color;
     this.imageRenderer.transform = this.transform;
-    this.imageRenderer.drawImagePoints(image, topLeft, topRight, bottomRight, bottomLeft, frame);
+    this.imageRenderer.drawImagePoints(tlX, tlY, trX, trY, brX, brY, blX, blY, image, frame);
   }
 
   /**
    * Draw a render target to the screen.
-   * @param position - The position to draw the render target at.
+   * @param x - The x-coordinate to draw the render target at.
+   * @param y - The y-coordinate to draw the render target at.
    * @param target - The render target to draw.
    */
-  drawRenderTarget(position: Vec2, target: RenderTarget): void {
+  drawRenderTarget(x: number, y: number, target: RenderTarget): void {
     this.shapeRenderer.commit();
-    this.imageRenderer.drawRenderTarget(position, target);
+    this.imageRenderer.drawRenderTarget(x, y, target);
   }
 
   /**
    * Draw a string of text to the screen.
-   * @param position - The position to draw the text at.
+   * @param x - The x-coordinate to draw the text at.
    * @param font - The font to use.
    * @param text - The text to draw.
    */
-  drawBitmapText(position: Vec2, font: BitmapFont, text: string): void {
+  drawBitmapText(x: number, y: number, font: BitmapFont, text: string): void {
     this.shapeRenderer.commit();
-    this.imageRenderer.drawBitmapText(position, font, text);
+    this.imageRenderer.drawBitmapText(x, y, font, text);
   }
 
   setBool(location: WebGLUniformLocation | null, value: boolean): void {
@@ -335,7 +355,6 @@ export class Graphics {
     this.context.gl.uniform3i(location, value1, value2, value3);
   }
 
-  // biome-ignore lint/nursery/useMaxParams: Can be called a lot so optimize for performance
   setInt4(location: WebGLUniformLocation | null, value1: number, value2: number, value3: number, value4: number): void {
     this.context.gl.uniform4i(location, value1, value2, value3, value4);
   }
@@ -356,7 +375,6 @@ export class Graphics {
     this.context.gl.uniform3f(location, value1, value2, value3);
   }
 
-  // biome-ignore lint/nursery/useMaxParams: Can be called a lot so optimize for performance
   setFloat4(
     location: WebGLUniformLocation | null,
     value1: number,

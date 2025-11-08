@@ -1,5 +1,5 @@
+/** biome-ignore-all lint/nursery/useMaxParams: Not passing objects to help performance */
 import { Rectangle } from '../../math/rectangle.js';
-import { Vec2 } from '../../math/vec2.js';
 import { Vec3 } from '../../math/vec3.js';
 import type { BitmapFont } from '../bitmapFont.js';
 import type { Color } from '../color.js';
@@ -8,7 +8,6 @@ import type { GLContext } from '../glContext.js';
 import type { Image } from '../image.js';
 import type { RenderTarget } from '../renderTarget.js';
 import { Shader } from '../shader.js';
-import type { Flip } from '../types.js';
 import { BaseRenderer } from './baseRenderer.js';
 
 /**
@@ -46,13 +45,9 @@ export class ImageRenderer extends BaseRenderer {
   private tempVec3: Vec3;
 
   /**
-   * Temporary vector to store a uv position.
+   * Temporary frame to store the image region.
    */
-  private tempTexCoord: Vec2;
-
   private tempFrame: Rectangle;
-
-  private tempSize: Vec2;
 
   /**
    * Current batch image.
@@ -72,9 +67,7 @@ export class ImageRenderer extends BaseRenderer {
     super(context);
 
     this.tempVec3 = new Vec3();
-    this.tempTexCoord = new Vec2();
     this.tempFrame = new Rectangle();
-    this.tempSize = new Vec2();
 
     this.vertexBuffer = this.context.gl.createBuffer();
     this.vertexIndices = new Float32Array(this.BUFFER_SIZE * QUAD_OFFSET);
@@ -173,15 +166,12 @@ export class ImageRenderer extends BaseRenderer {
 
   /**
    * Draw an image to the screen.
+   * @param x - The x-coordinate to draw the image at.
+   * @param y - The y-coordinate to draw the image at.
    * @param image - The image to draw.
-   * @param position - The position to draw the image at.
-   * @param flip - Should the image be flipped.
    * @param frame - Optional region of the image to draw. Defaults to the full image.
-   * @param size - Optional size to scale the image to. Defaults to the image size.
    */
-
-  // biome-ignore lint/nursery/useMaxParams: This will get called often and should be optimized for performance.
-  drawImage(image: Image, position: Vec2, flip: Flip, frame?: Rectangle, size?: Vec2): void {
+  drawImage(x: number, y: number, image: Image, frame?: Rectangle): void {
     if (this.index >= this.BUFFER_SIZE || this.currentTarget || (this.currentImage && this.currentImage !== image)) {
       this.commit();
     }
@@ -192,55 +182,50 @@ export class ImageRenderer extends BaseRenderer {
       this.tempFrame.set(0, 0, image.width, image.height);
     }
 
-    if (size) {
-      this.tempSize.copyFrom(size);
-    } else {
-      this.tempSize.set(image.width, image.height);
-    }
-
     this.currentImage = image;
 
-    this.tempVec3.transformMat4(this.transform, position.x, position.y, 0);
-    this.getFlippedUV(this.tempFrame, this.tempSize, flip, 0, this.tempTexCoord);
-    this.updateBuffer(this.tempVec3, this.color, this.tempTexCoord, 0);
+    let u = this.tempFrame.x / image.width;
+    let v = this.tempFrame.y / image.height;
+    this.updateBuffer(x, y, u, v, this.color, 0);
 
-    this.tempVec3.transformMat4(this.transform, position.x + this.tempFrame.width, position.y, 0);
-    this.getFlippedUV(this.tempFrame, this.tempSize, flip, 1, this.tempTexCoord);
-    this.updateBuffer(this.tempVec3, this.color, this.tempTexCoord, 1);
+    u = (this.tempFrame.x + this.tempFrame.width) / image.width;
+    v = this.tempFrame.y / image.height;
+    this.updateBuffer(x + this.tempFrame.width, y, u, v, this.color, 1);
 
-    this.tempVec3.transformMat4(
-      this.transform,
-      position.x + this.tempFrame.width,
-      position.y + this.tempFrame.height,
-      0,
-    );
-    this.getFlippedUV(this.tempFrame, this.tempSize, flip, 2, this.tempTexCoord);
-    this.updateBuffer(this.tempVec3, this.color, this.tempTexCoord, 2);
+    u = (this.tempFrame.x + this.tempFrame.width) / image.width;
+    v = (this.tempFrame.y + this.tempFrame.height) / image.height;
+    this.updateBuffer(x + this.tempFrame.width, y + this.tempFrame.height, u, v, this.color, 2);
 
-    this.tempVec3.transformMat4(this.transform, position.x, position.y + this.tempFrame.height, 0);
-    this.getFlippedUV(this.tempFrame, this.tempSize, flip, 3, this.tempTexCoord);
-    this.updateBuffer(this.tempVec3, this.color, this.tempTexCoord, 3);
+    u = this.tempFrame.x / image.width;
+    v = (this.tempFrame.y + this.tempFrame.height) / image.height;
+    this.updateBuffer(x, y + this.tempFrame.height, u, v, this.color, 3);
 
     this.index++;
   }
 
   /**
    * Draws an image on the canvas using the specified corner points.
+   * @param tlX - The x-coordinate of the top-left corner.
+   * @param tlY - The y-coordinate of the top-left corner.
+   * @param trX - The x-coordinate of the top-right corner.
+   * @param trY - The y-coordinate of the top-right corner.
+   * @param brX - The x-coordinate of the bottom-right corner.
+   * @param brY - The y-coordinate of the bottom-right corner.
+   * @param blX - The x-coordinate of the bottom-left corner.
+   * @param blY - The y-coordinate of the bottom-left corner.
    * @param image - The image to draw.
-   * @param topLeft - The top-left corner point.
-   * @param topRight - The top-right corner point.
-   * @param bottomRight - The bottom-right corner point.
-   * @param bottomLeft - The bottom-left corner point.
    * @param frame - Optional region of the image to draw. Defaults to the full image.
    */
-
-  // biome-ignore lint/nursery/useMaxParams: This will get called often and should be optimized for performance.
   drawImagePoints(
+    tlX: number,
+    tlY: number,
+    trX: number,
+    trY: number,
+    brX: number,
+    brY: number,
+    blX: number,
+    blY: number,
     image: Image,
-    topLeft: Vec2,
-    topRight: Vec2,
-    bottomRight: Vec2,
-    bottomLeft: Vec2,
     frame?: Rectangle,
   ): void {
     if (this.index >= this.BUFFER_SIZE || this.currentTarget || (this.currentImage && this.currentImage !== image)) {
@@ -255,34 +240,32 @@ export class ImageRenderer extends BaseRenderer {
 
     this.currentImage = image;
 
-    this.tempVec3.transformMat4(this.transform, topLeft.x, topLeft.y, 0);
-    this.tempTexCoord.set(this.tempFrame.x / image.width, this.tempFrame.y / image.height);
-    this.updateBuffer(this.tempVec3, this.color, this.tempTexCoord, 0);
+    let u = this.tempFrame.x / image.width;
+    let v = this.tempFrame.y / image.height;
+    this.updateBuffer(tlX, tlY, u, v, this.color, 0);
 
-    this.tempVec3.transformMat4(this.transform, topRight.x, topRight.y, 0);
-    this.tempTexCoord.set((this.tempFrame.x + this.tempFrame.width) / image.width, this.tempFrame.y / image.height);
-    this.updateBuffer(this.tempVec3, this.color, this.tempTexCoord, 1);
+    u = (this.tempFrame.x + this.tempFrame.width) / image.width;
+    v = this.tempFrame.y / image.height;
+    this.updateBuffer(trX, trY, u, v, this.color, 1);
 
-    this.tempVec3.transformMat4(this.transform, bottomRight.x, bottomRight.y, 0);
-    this.tempTexCoord.set(
-      (this.tempFrame.x + this.tempFrame.width) / image.width,
-      (this.tempFrame.y + this.tempFrame.height) / image.height,
-    );
-    this.updateBuffer(this.tempVec3, this.color, this.tempTexCoord, 2);
+    u = (this.tempFrame.x + this.tempFrame.width) / image.width;
+    v = (this.tempFrame.y + this.tempFrame.height) / image.height;
+    this.updateBuffer(brX, brY, u, v, this.color, 2);
 
-    this.tempVec3.transformMat4(this.transform, bottomLeft.x, bottomLeft.y, 0);
-    this.tempTexCoord.set(this.tempFrame.x / image.width, (this.tempFrame.y + this.tempFrame.height) / image.height);
-    this.updateBuffer(this.tempVec3, this.color, this.tempTexCoord, 3);
+    u = this.tempFrame.x / image.width;
+    v = (this.tempFrame.y + this.tempFrame.height) / image.height;
+    this.updateBuffer(blX, blY, u, v, this.color, 3);
 
     this.index++;
   }
 
   /**
    * Draw a render target to the screen.
-   * @param position - The position to draw the render target at.
+   * @param x - The x-coordinate to draw the render target at.
+   * @param y - The y-coordinate to draw the render target at.
    * @param target - The render target to draw.
    */
-  drawRenderTarget(position: Vec2, target: RenderTarget): void {
+  drawRenderTarget(x: number, y: number, target: RenderTarget): void {
     if (this.index >= this.BUFFER_SIZE || this.currentImage || (this.currentTarget && this.currentTarget !== target)) {
       this.commit();
     }
@@ -291,32 +274,21 @@ export class ImageRenderer extends BaseRenderer {
     const width = target.width;
     const height = target.height;
 
-    this.tempVec3.transformMat4(this.transform, position.x, position.y, 0);
-    this.tempTexCoord.set(0, 1);
-    this.updateBuffer(this.tempVec3, this.color, this.tempTexCoord, 0);
-
-    this.tempVec3.transformMat4(this.transform, position.x + width, position.y, 0);
-    this.tempTexCoord.set(1, 1);
-    this.updateBuffer(this.tempVec3, this.color, this.tempTexCoord, 1);
-
-    this.tempVec3.transformMat4(this.transform, position.x + width, position.y + height, 0);
-    this.tempTexCoord.set(1, 0);
-    this.updateBuffer(this.tempVec3, this.color, this.tempTexCoord, 2);
-
-    this.tempVec3.transformMat4(this.transform, position.x, position.y + height, 0);
-    this.tempTexCoord.set(0, 0);
-    this.updateBuffer(this.tempVec3, this.color, this.tempTexCoord, 3);
+    this.updateBuffer(x, y, 0, 1, this.color, 0);
+    this.updateBuffer(x + width, y, 1, 1, this.color, 1);
+    this.updateBuffer(x + width, y + height, 1, 0, this.color, 2);
+    this.updateBuffer(x, y + height, 0, 0, this.color, 3);
 
     this.index++;
   }
 
   /**
    * Draw a string of text to the screen.
-   * @param position - The position to draw the text at.
+   * @param x - The x-coordinate to draw the text at.
    * @param font - The font to use.
    * @param text - The text to draw.
    */
-  drawBitmapText(position: Vec2, font: BitmapFont, text: string): void {
+  drawBitmapText(x: number, y: number, font: BitmapFont, text: string): void {
     if (!text) {
       return;
     }
@@ -349,44 +321,29 @@ export class ImageRenderer extends BaseRenderer {
       }
       xOffset += kerning;
 
-      this.tempVec3.transformMat4(
-        this.transform,
-        position.x + xOffset + charData.xOffset,
-        position.y + charData.yOffset,
-        0,
-      );
-      this.tempTexCoord.set(charData.x / font.image.width, charData.y / font.image.height);
-      this.updateBuffer(this.tempVec3, this.color, this.tempTexCoord, 0);
+      let pX = x + xOffset + charData.xOffset;
+      let pY = y + charData.yOffset;
+      let u = charData.x / font.image.width;
+      let v = charData.y / font.image.height;
+      this.updateBuffer(pX, pY, u, v, this.color, 0);
 
-      this.tempVec3.transformMat4(
-        this.transform,
-        position.x + xOffset + charData.xOffset + charData.width,
-        position.y + charData.yOffset,
-        0,
-      );
-      this.tempTexCoord.set((charData.x + charData.width) / font.image.width, charData.y / font.image.height);
-      this.updateBuffer(this.tempVec3, this.color, this.tempTexCoord, 1);
+      pX = x + xOffset + charData.xOffset + charData.width;
+      pY = y + charData.yOffset;
+      u = (charData.x + charData.width) / font.image.width;
+      v = charData.y / font.image.height;
+      this.updateBuffer(pX, pY, u, v, this.color, 1);
 
-      this.tempVec3.transformMat4(
-        this.transform,
-        position.x + xOffset + charData.xOffset + charData.width,
-        position.y + charData.yOffset + charData.height,
-        0,
-      );
-      this.tempTexCoord.set(
-        (charData.x + charData.width) / font.image.width,
-        (charData.y + charData.height) / font.image.height,
-      );
-      this.updateBuffer(this.tempVec3, this.color, this.tempTexCoord, 2);
+      pX = x + xOffset + charData.xOffset + charData.width;
+      pY = y + charData.yOffset + charData.height;
+      u = (charData.x + charData.width) / font.image.width;
+      v = (charData.y + charData.height) / font.image.height;
+      this.updateBuffer(pX, pY, u, v, this.color, 2);
 
-      this.tempVec3.transformMat4(
-        this.transform,
-        position.x + xOffset + charData.xOffset,
-        position.y + charData.yOffset + charData.height,
-        0,
-      );
-      this.tempTexCoord.set(charData.x / font.image.width, (charData.y + charData.height) / font.image.height);
-      this.updateBuffer(this.tempVec3, this.color, this.tempTexCoord, 3);
+      pX = x + xOffset + charData.xOffset;
+      pY = y + charData.yOffset + charData.height;
+      u = charData.x / font.image.width;
+      v = (charData.y + charData.height) / font.image.height;
+      this.updateBuffer(pX, pY, u, v, this.color, 3);
 
       xOffset += charData.xAdvance;
       this.index++;
@@ -394,107 +351,19 @@ export class ImageRenderer extends BaseRenderer {
   }
 
   /**
-   * Get flipped uv coordinates.
-   * @param sx - The x position of the section to draw.
-   * @param sy - The y position of the section to draw.
-   * @param sw - The width of the section to draw.
-   * @param sh - The height of the section to draw.
-   * @param textureWidth - The width of the texture.
-   * @param textureHeight - The height of the texture.
-   * @param flipX - Should the image be flipped on the x-axis.
-   * @param flipY - Should the image be flipped on the y-axis.
-   * @param pointOffset - The offset of the point in the quad. [tl, tr, br, bl] clockwise.
-   * @param out - The vector to store the result in.
-   */
-
-  // biome-ignore lint/nursery/useMaxParams: This will get called often and should be optimized for performance.
-  private getFlippedUV(frame: Rectangle, textureSize: Vec2, flip: Flip, pointOffset: number, out: Vec2): void {
-    if (flip === 'both') {
-      switch (pointOffset) {
-        case 0:
-          out.set((frame.x + frame.width) / textureSize.x, (frame.y + frame.height) / textureSize.y);
-          break;
-
-        case 1:
-          out.set(frame.x / textureSize.x, (frame.y + frame.height) / textureSize.y);
-          break;
-
-        case 2:
-          out.set(frame.x / textureSize.x, frame.y / textureSize.y);
-          break;
-
-        case 3:
-          out.set((frame.x + frame.width) / textureSize.x, frame.y / textureSize.y);
-          break;
-      }
-    } else if (flip === 'horizontal') {
-      switch (pointOffset) {
-        case 0:
-          out.set(frame.x / textureSize.x, (frame.y + frame.height) / textureSize.y);
-          break;
-
-        case 1:
-          out.set((frame.x + frame.width) / textureSize.x, (frame.y + frame.height) / textureSize.y);
-          break;
-
-        case 2:
-          out.set((frame.x + frame.width) / textureSize.x, frame.y / textureSize.y);
-          break;
-
-        case 3:
-          out.set(frame.x / textureSize.x, frame.y / textureSize.y);
-          break;
-      }
-    } else if (flip === 'vertical') {
-      switch (pointOffset) {
-        case 0:
-          out.set((frame.x + frame.width) / textureSize.x, frame.y / textureSize.y);
-          break;
-
-        case 1:
-          out.set(frame.x / textureSize.x, frame.y / textureSize.y);
-          break;
-
-        case 2:
-          out.set(frame.x / textureSize.x, (frame.y + frame.height) / textureSize.y);
-          break;
-
-        case 3:
-          out.set((frame.x + frame.width) / textureSize.x, (frame.y + frame.height) / textureSize.y);
-          break;
-      }
-    } else {
-      switch (pointOffset) {
-        case 0:
-          out.set(frame.x / textureSize.x, frame.y / textureSize.y);
-          break;
-
-        case 1:
-          out.set((frame.x + frame.width) / textureSize.x, frame.y / textureSize.y);
-          break;
-
-        case 2:
-          out.set((frame.x + frame.width) / textureSize.x, (frame.y + frame.height) / textureSize.y);
-          break;
-
-        case 3:
-          out.set(frame.x / textureSize.x, (frame.y + frame.height) / textureSize.y);
-          break;
-      }
-    }
-  }
-
-  /**
    * Update the buffer with a position and color.
-   * @param position - The point to add to the buffer.
+   * @param x - The x-coordinate of the point.
+   * @param y - The y-coordinate of the point.
+   * @param u - The u texture coordinate of the point.
+   * @param v - The v texture coordinate of the point.
    * @param color - The color of the point.
-   * @param uv - The uv coordinates of the point.
    * @param pointOffset - The offset of the point in the triangle.
    */
-  private updateBuffer(position: Vec3, color: Color, uv: Vec2, pointOffset: number): void {
+  private updateBuffer(x: number, y: number, u: number, v: number, color: Color, pointOffset: number): void {
+    this.tempVec3.transformMat4(this.transform, x, y, 0);
     const i = this.index * QUAD_OFFSET + pointOffset * OFFSET;
-    this.vertexIndices[i] = position.x;
-    this.vertexIndices[i + 1] = position.y;
+    this.vertexIndices[i] = this.tempVec3.x;
+    this.vertexIndices[i + 1] = this.tempVec3.y;
     this.vertexIndices[i + 2] = 0;
 
     this.vertexIndices[i + 3] = color.red;
@@ -502,8 +371,8 @@ export class ImageRenderer extends BaseRenderer {
     this.vertexIndices[i + 5] = color.blue;
     this.vertexIndices[i + 6] = color.alpha;
 
-    this.vertexIndices[i + 7] = uv.x;
-    this.vertexIndices[i + 8] = uv.y;
+    this.vertexIndices[i + 7] = u;
+    this.vertexIndices[i + 8] = v;
   }
 
   /**

@@ -1,5 +1,5 @@
-import type { Rectangle } from '../../math/rectangle.js';
-import { Vec2 } from '../../math/vec2.js';
+/** biome-ignore-all lint/nursery/useMaxParams: Not passing objects to help performance. */
+import type { Vec2 } from '../../math/vec2.js';
 import { Vec3 } from '../../math/vec3.js';
 import type { Color } from '../color.js';
 import { getShapeFragmentSource } from '../defaultShaders.js';
@@ -40,17 +40,6 @@ export class ShapeRenderer extends BaseRenderer {
    */
   private readonly tempVec3: Vec3;
 
-  private readonly tempLineStart: Vec2;
-  private readonly tempLineEnd: Vec2;
-
-  private readonly tempP1: Vec2;
-
-  private readonly tempP2: Vec2;
-
-  private readonly tempP3: Vec2;
-
-  private readonly tempP4: Vec2;
-
   /**
    * Create a new shape renderer.
    */
@@ -58,13 +47,6 @@ export class ShapeRenderer extends BaseRenderer {
     super(context);
 
     this.tempVec3 = new Vec3();
-    this.tempLineStart = new Vec2();
-    this.tempLineEnd = new Vec2();
-
-    this.tempP1 = new Vec2();
-    this.tempP2 = new Vec2();
-    this.tempP3 = new Vec2();
-    this.tempP4 = new Vec2();
 
     this.vertexBuffer = context.gl.createBuffer();
     this.vertexIndices = new Float32Array(this.BUFFER_SIZE * TRIANGLE_OFFSET);
@@ -145,37 +127,36 @@ export class ShapeRenderer extends BaseRenderer {
 
   /**
    * Draw a filled triangle.
-   * @param p1 - The first point of the triangle.
-   * @param p2 - The second point of the triangle.
-   * @param p3 - The third point of the triangle.
+   * @param p1X - The x-coordinate of the first point.
+   * @param p1Y - The y-coordinate of the first point.
+   * @param p2X - The x-coordinate of the second point.
+   * @param p2Y - The y-coordinate of the second point.
+   * @param p3X - The x-coordinate of the third point.
+   * @param p3Y - The y-coordinate of the third point.
    */
-  drawFilledTriangle(p1: Vec2, p2: Vec2, p3: Vec2): void {
+  drawFilledTriangle(p1X: number, p1Y: number, p2X: number, p2Y: number, p3X: number, p3Y: number): void {
     if (this.index >= this.BUFFER_SIZE) {
       this.commit();
     }
 
-    this.tempVec3.transformMat4(this.transform, p1.x, p1.y, 0);
-    this.updateBuffer(this.tempVec3, this.color, 0);
-
-    this.tempVec3.transformMat4(this.transform, p2.x, p2.y, 0);
-    this.updateBuffer(this.tempVec3, this.color, 1);
-
-    this.tempVec3.transformMat4(this.transform, p3.x, p3.y, 0);
-    this.updateBuffer(this.tempVec3, this.color, 2);
-
+    this.updateBuffer(p1X, p1Y, this.color, 0);
+    this.updateBuffer(p2X, p2Y, this.color, 0);
+    this.updateBuffer(p3X, p3Y, this.color, 0);
     this.index++;
   }
 
   /**
    * Draw a line.
-   * @param p1 - The first point of the line.
-   * @param p2 - The second point of the line.
+   * @param p1X - The x-coordinate of the first point.
+   * @param p1Y - The y-coordinate of the first point.
+   * @param p2X - The x-coordinate of the second point.
+   * @param p2Y - The y-coordinate of the second point.
    * @param align - The alignment of the line.
    * @param lineWidth - The width of the line.
    */
-  drawLine(p1: Vec2, p2: Vec2, align: LineAlign, lineWidth: number): void {
-    const dx = p2.x - p1.x;
-    const dy = p2.y - p1.y;
+  drawLine(p1X: number, p1Y: number, p2X: number, p2Y: number, align: LineAlign, lineWidth: number): void {
+    const dx = p2X - p1X;
+    const dy = p2Y - p1Y;
     const lineLength = Math.sqrt(dx * dx + dy * dy);
     if (!lineLength) {
       return;
@@ -186,78 +167,64 @@ export class ShapeRenderer extends BaseRenderer {
     const ddy = scale * dx;
     switch (align) {
       case 'inside':
-        this.tempP1.set(p1.x, p1.y);
-        this.tempP2.set(p1.x + ddx * 2, p1.y + ddy * 2);
-        this.tempP3.set(p2.x, p2.y);
-        this.tempP4.set(p2.x + ddx * 2, p2.y + ddy * 2);
+        this.drawFilledTriangle(p1X, p1Y, p1X + ddx * 2, p1Y + ddy * 2, p2X, p2Y);
+        this.drawFilledTriangle(p2X, p2Y, p1X + ddx * 2, p1Y + ddy * 2, p2X + ddx * 2, p2Y + ddy * 2);
         break;
 
       case 'center':
-        this.tempP1.set(p1.x + ddx, p1.y + ddy);
-        this.tempP2.set(p1.x - ddx, p1.y - ddy);
-        this.tempP3.set(p2.x + ddx, p2.y + ddy);
-        this.tempP4.set(p2.x - ddx, p2.y - ddy);
+        this.drawFilledTriangle(p1X + ddx, p1Y + ddy, p1X - ddx, p1Y - ddy, p2X + ddx, p2Y + ddy);
+        this.drawFilledTriangle(p2X + ddx, p2Y + ddy, p1X - ddx, p1Y - ddy, p2X - ddx, p2Y - ddy);
         break;
 
       case 'outside':
-        this.tempP1.set(p1.x, p1.y);
-        this.tempP2.set(p1.x - ddx * 2, p1.y - ddy * 2);
-        this.tempP3.set(p2.x, p2.y);
-        this.tempP4.set(p2.x - ddx * 2, p2.y - ddy * 2);
+        this.drawFilledTriangle(p1X, p1Y, p1X - ddx * 2, p1Y - ddy * 2, p2X, p2Y);
+        this.drawFilledTriangle(p2X, p2Y, p1X - ddx * 2, p1Y - ddy * 2, p2X - ddx * 2, p2Y - ddy * 2);
         break;
     }
-
-    this.drawFilledTriangle(this.tempP1, this.tempP2, this.tempP3);
-    this.drawFilledTriangle(this.tempP3, this.tempP2, this.tempP4);
   }
 
   /**
    * Draw a filled rectangle.
-   * @param rect - The rectangle to draw.
+   * @param x - The x-coordinate of the rectangle.
+   * @param y - The y-coordinate of the rectangle.
+   * @param width - The width of the rectangle.
+   * @param height - The height of the rectangle.
    */
-  drawFilledRect(rect: Rectangle): void {
-    this.tempP1.set(rect.x, rect.y);
-    this.tempP2.set(rect.x + rect.width, rect.y);
-    this.tempP3.set(rect.x, rect.y + rect.height);
-    this.tempP4.set(rect.x + rect.width, rect.y + rect.height);
-    this.drawFilledTriangle(this.tempP1, this.tempP2, this.tempP3);
-    this.drawFilledTriangle(this.tempP3, this.tempP2, this.tempP4);
+  drawFilledRect(x: number, y: number, width: number, height: number): void {
+    this.drawFilledTriangle(x, y, x + width, y, x, y + height);
+    this.drawFilledTriangle(x, y + height, x + width, y, x + width, y + height);
   }
 
   /**
    * Draw a rectangle.
-   * @param rect - The rectangle to draw.
+   * @param x - The x-coordinate of the rectangle.
+   * @param y - The y-coordinate of the rectangle.
+   * @param width - The width of the rectangle.
+   * @param height - The height of the rectangle.
    * @param lineWidth - The width of the line.
    */
-  drawRect(rect: Rectangle, lineWidth: number): void {
+  drawRect(x: number, y: number, width: number, height: number, lineWidth: number): void {
     // Top.
-    this.tempLineStart.set(rect.x, rect.y);
-    this.tempLineEnd.set(rect.x + rect.width, rect.y);
-    this.drawLine(this.tempLineStart, this.tempLineEnd, 'inside', lineWidth);
+    this.drawLine(x, y, x + width, y, 'inside', lineWidth);
 
     // Right.
-    this.tempLineStart.set(rect.x + rect.width, rect.y);
-    this.tempLineEnd.set(rect.x + rect.width, rect.y + rect.height);
-    this.drawLine(this.tempLineStart, this.tempLineEnd, 'inside', lineWidth);
+    this.drawLine(x + width, y, x + width, y + height, 'inside', lineWidth);
 
     // Bottom.
-    this.tempLineStart.set(rect.x + rect.width, rect.y + rect.height);
-    this.tempLineEnd.set(rect.x, rect.y + rect.height);
-    this.drawLine(this.tempLineStart, this.tempLineEnd, 'inside', lineWidth);
+    this.drawLine(x + width, y + height, x, y + height, 'inside', lineWidth);
 
     // Left.
-    this.tempLineStart.set(rect.x, rect.y + rect.height);
-    this.tempLineEnd.set(rect.x, rect.y);
-    this.drawLine(this.tempLineStart, this.tempLineEnd, 'inside', lineWidth);
+    this.drawLine(x, y + height, x, y, 'inside', lineWidth);
   }
 
   /**
    * Draw a filled circle.
-   * @param center - The center of the circle.
+   * @param centerX - The x-coordinate of the center of the circle.
+   * @param centerY - The y-coordinate of the center of the circle.
    * @param radius - The radius of the circle.
    * @param segments - The number of segments in the circle.
    */
-  drawFilledCircle(center: Vec2, radius: number, segments: number): void {
+  drawFilledCircle(centerX: number, centerY: number, radius: number, segments: number): void {
     if (radius <= 0) {
       console.error('ShapeRenderer: Radius must be positive.');
       return;
@@ -274,25 +241,24 @@ export class ShapeRenderer extends BaseRenderer {
     let sx = radius;
     let sy = 0.0;
     for (let i = 0; i < segments; i++) {
-      const px = sx + center.x;
-      const py = sy + center.y;
+      const px = sx + centerX;
+      const py = sy + centerY;
       const t = sx;
       sx = cos * sx - sin * sy;
       sy = cos * sy + sin * t;
-      this.tempP1.set(px, py);
-      this.tempP2.set(sx + center.x, sy + center.y);
-      this.drawFilledTriangle(this.tempP1, this.tempP2, center);
+      this.drawFilledTriangle(px, py, sx + centerX, sy + centerY, centerX, centerY);
     }
   }
 
   /**
    * Draw a circle.
-   * @param center - The center of the circle.
+   * @param centerX - The x-coordinate of the center of the circle.
+   * @param centerY - The y-coordinate of the center of the circle.
    * @param radius - The radius of the circle.
    * @param segments - The number of segments in the circle.
    * @param lineWidth - The width of the line.
    */
-  drawCircle(center: Vec2, radius: number, segments: number, lineWidth: number): void {
+  drawCircle(centerX: number, centerY: number, radius: number, segments: number, lineWidth: number): void {
     if (radius <= 0) {
       console.error('ShapeRenderer: Radius must be positive.');
       return;
@@ -314,23 +280,22 @@ export class ShapeRenderer extends BaseRenderer {
     let sx = radius;
     let sy = 0.0;
     for (let i = 0; i < segments; i++) {
-      const px = sx + center.x;
-      const py = sy + center.y;
+      const px = sx + centerX;
+      const py = sy + centerY;
       const t = sx;
       sx = cos * sx - sin * sy;
       sy = cos * sy + sin * t;
-      this.tempLineStart.set(px, py);
-      this.tempLineEnd.set(sx + center.x, sy + center.y);
-      this.drawLine(this.tempLineStart, this.tempLineEnd, 'outside', lineWidth);
+      this.drawLine(px, py, sx + centerX, sy + centerY, 'outside', lineWidth);
     }
   }
 
   /**
    * Draw a filled polygon.
-   * @param center - The center of the polygon.
+   * @param centerX - The x-coordinate of the center of the circle.
+   * @param centerY - The y-coordinate of the center of the circle.
    * @param vertices - The vertices of the polygon.
    */
-  drawFilledPolygon(center: Vec2, vertices: Vec2[]): void {
+  drawFilledPolygon(centerX: number, centerY: number, vertices: Vec2[]): void {
     if (vertices.length < 3) {
       console.log('Cannot draw polygon with less than 3 points');
       return;
@@ -341,21 +306,26 @@ export class ShapeRenderer extends BaseRenderer {
 
     for (let i = 2; i < vertices.length; i++) {
       const current = vertices[i];
-      this.tempP1.set(first.x + center.x, first.y + center.y);
-      this.tempP2.set(last.x + center.x, last.y + center.y);
-      this.tempP3.set(current.x + center.x, current.y + center.y);
-      this.drawFilledTriangle(this.tempP1, this.tempP2, this.tempP3);
+      this.drawFilledTriangle(
+        first.x + centerX,
+        first.y + centerY,
+        last.x + centerX,
+        last.y + centerY,
+        current.x + centerX,
+        current.y + centerY,
+      );
       last = current;
     }
   }
 
   /**
    * Draw a polygon.
-   * @param center - The center of the polygon.
+   * @param centerX - The x-coordinate of the center of the circle.
+   * @param centerY - The y-coordinate of the center of the circle.
    * @param vertices - The vertices of the polygon.
    * @param lineWidth - The width of the line.
    */
-  drawPolygon(center: Vec2, vertices: Vec2[], lineWidth: number): void {
+  drawPolygon(centerX: number, centerY: number, vertices: Vec2[], lineWidth: number): void {
     if (vertices.length < 3) {
       console.log('Cannot draw polygon with less than 3 points');
       return;
@@ -366,28 +336,27 @@ export class ShapeRenderer extends BaseRenderer {
 
     for (let i = 1; i < vertices.length; i++) {
       const current = vertices[i];
-      this.tempLineStart.set(last.x + center.x, last.y + center.y);
-      this.tempLineEnd.set(current.x + center.x, current.y + center.y);
-      this.drawLine(this.tempLineStart, this.tempLineEnd, 'inside', lineWidth);
+      this.drawLine(last.x + centerX, last.y + centerY, current.x + centerX, current.y + centerY, 'inside', lineWidth);
       last = current;
     }
 
     // Connect the last vertex to the first.
-    this.tempLineStart.set(last.x + center.x, last.y + center.y);
-    this.tempLineEnd.set(start.x + center.x, start.y + center.y);
-    this.drawLine(this.tempLineStart, this.tempLineEnd, 'inside', lineWidth);
+    this.drawLine(last.x + centerX, last.y + centerY, start.x + centerX, start.y + centerY, 'inside', lineWidth);
   }
 
   /**
    * Update the buffer with a point and color.
-   * @param point - The point to add to the buffer.
+   * @param x - The x-coordinate of the point.
+   * @param y - The y-coordinate of the point.
    * @param color - The color of the point.
    * @param pointOffset - The offset of the point in the triangle.
    */
-  private updateBuffer(point: Vec3, color: Color, pointOffset: number): void {
+  private updateBuffer(x: number, y: number, color: Color, pointOffset: number): void {
+    this.tempVec3.transformMat4(this.transform, x, y, 0);
     const i = this.index * TRIANGLE_OFFSET + pointOffset * OFFSET;
-    this.vertexIndices[i] = point.x;
-    this.vertexIndices[i + 1] = point.y;
+
+    this.vertexIndices[i] = this.tempVec3.x;
+    this.vertexIndices[i + 1] = this.tempVec3.y;
     this.vertexIndices[i + 2] = 0;
     this.vertexIndices[i + 3] = color.red;
     this.vertexIndices[i + 4] = color.green;

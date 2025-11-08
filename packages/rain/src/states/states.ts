@@ -40,14 +40,16 @@ export class States {
 
       graphics.transform.identity();
       for (const camera of cameras) {
-        camera.drawContent(graphics, this.currentState.draw);
+        camera.drawContent(graphics, this.currentState.draw.bind(this.currentState));
       }
 
       graphics.color.set(1, 1, 1, 1);
       graphics.transform.identity();
+      graphics.start();
       for (const camera of cameras) {
         camera.drawSelf(graphics);
       }
+      graphics.commit();
     }
   }
 
