@@ -362,6 +362,7 @@ export class ImageRenderer extends BaseRenderer {
   private updateBuffer(x: number, y: number, u: number, v: number, color: Color, pointOffset: number): void {
     this.tempVec3.transformMat4(this.transform, x, y, 0);
     const i = this.index * QUAD_OFFSET + pointOffset * OFFSET;
+
     this.vertexIndices[i] = this.tempVec3.x;
     this.vertexIndices[i + 1] = this.tempVec3.y;
     this.vertexIndices[i + 2] = 0;

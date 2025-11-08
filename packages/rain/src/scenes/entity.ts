@@ -3,38 +3,15 @@ import type { Graphics } from '../graphics/graphics.js';
 export class Entity {
   active: boolean;
 
-  readonly entities: Entities;
+  readonly entities: Entity[];
+
+  private readonly entitiesToRemove: Entity[];
 
   constructor(active: boolean = true) {
     this.active = active;
-    this.entities = new Entities();
+    this.entities = [];
+    this.entitiesToRemove = [];
   }
-
-  addEntity(entity: Entity): void {
-    this.entities.add(entity);
-  }
-
-  removeEntity(entity: Entity): void {
-    this.entities.remove(entity);
-  }
-
-  update(dt: number): void {
-    this.entities.update(dt);
-  }
-
-  draw(graphics: Graphics): void {
-    this.entities.draw(graphics);
-  }
-
-  destroy(): void {
-    this.entities.destroy();
-  }
-}
-
-export class Entities {
-  readonly entities: Entity[] = [];
-
-  private readonly entitiesToRemove: Entity[] = [];
 
   add(entity: Entity): void {
     this.entities.push(entity);

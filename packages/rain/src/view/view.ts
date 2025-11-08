@@ -30,11 +30,11 @@ export class View {
   }
 
   get canvasWidth(): number {
-    return this.canvas.width * this.pixelRatio;
+    return this.canvas.width;
   }
 
   get canvasHeight(): number {
-    return this.canvas.height * this.pixelRatio;
+    return this.canvas.height;
   }
 
   get canvasCenterX(): number {
@@ -123,14 +123,14 @@ export class View {
     const { viewWidth, viewHeight, scaleFactorX, scaleFactorY, offsetX, offsetY } = this.scaleMode({
       designWidth: this.designWidth,
       designHeight: this.designHeight,
-      canvasWidth: styleWidth,
-      canvasHeight: styleHeight,
+      canvasWidth: styleWidth * this.pixelRatio,
+      canvasHeight: styleHeight * this.pixelRatio,
       anchorX: this.viewAnchor.x,
       anchorY: this.viewAnchor.y,
     });
 
-    this.canvas.width = (styleWidth / scaleFactorX) * this.pixelRatio;
-    this.canvas.height = (styleHeight / scaleFactorY) * this.pixelRatio;
+    this.canvas.width = styleWidth * this.pixelRatio;
+    this.canvas.height = styleHeight * this.pixelRatio;
 
     this.viewSize.set(viewWidth, viewHeight);
     this.viewScale.set(scaleFactorX, scaleFactorY);

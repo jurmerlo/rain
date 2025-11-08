@@ -1,10 +1,10 @@
-import { type Input, inject, State } from '@rainengine/rain';
+import { type Graphics, type Input, inject, Scene } from '@rainengine/rain';
+import { Bunny } from '../entities/bunny';
 import { Text } from '../entities/text';
 import { BunnyLayer } from '../layers/bunnyLayer';
 import { TextLayer } from '../layers/textLayer';
-import { Bunny } from '../entities/bunny';
 
-export class GameState extends State {
+export class GameScene extends Scene {
   @inject()
   private readonly input!: Input;
 
@@ -20,12 +20,12 @@ export class GameState extends State {
     this.buttonDown = false;
 
     this.bunnyLayer = new BunnyLayer();
-    this.addEntity(this.bunnyLayer);
+    this.add(this.bunnyLayer);
 
     const textLayer = new TextLayer();
     this.text = new Text();
-    textLayer.addEntity(this.text);
-    this.addEntity(textLayer);
+    textLayer.add(this.text);
+    this.add(textLayer);
 
     this.input.on('mousePressed', () => {
       this.buttonDown = true;
@@ -39,7 +39,6 @@ export class GameState extends State {
 
   override update(dt: number): void {
     super.update(dt);
-
     if (this.buttonDown) {
       for (let i = 0; i < 20; i++) {
         this.createBunny();
@@ -47,9 +46,13 @@ export class GameState extends State {
     }
   }
 
+  override draw(graphics: Graphics): void {
+    super.draw(graphics);
+  }
+
   private createBunny(): void {
     const bunny = new Bunny();
-    this.bunnyLayer.addEntity(bunny);
+    this.bunnyLayer.add(bunny);
     this.text.bunnyCount++;
   }
 }

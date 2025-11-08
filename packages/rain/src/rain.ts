@@ -12,7 +12,8 @@ import { RenderTarget } from './graphics/renderTarget.js';
 import { Input } from './input/input.js';
 import { clamp } from './math/mathUtils.js';
 import { Random } from './math/random.js';
-import { type StateClass, States } from './state/states.js';
+import type { SceneClass } from './scenes/scene.js';
+import { Scenes } from './scenes/scenes.js';
 import { Time } from './utils/time.js';
 import { View } from './view/view.js';
 
@@ -45,7 +46,7 @@ export class Rain {
 
   private inFocus: boolean;
 
-  private states: States;
+  private scenes: Scenes;
 
   private view: View;
 
@@ -111,8 +112,8 @@ export class Rain {
     const assets = new Assets();
     addService('assets', assets);
 
-    this.states = new States();
-    addService('states', this.states);
+    this.scenes = new Scenes();
+    addService('scenes', this.scenes);
 
     this.time = new Time();
     addService('time', this.time);
@@ -130,7 +131,7 @@ export class Rain {
     this.inFocus = false;
   }
 
-  start(startState: StateClass): void {
+  start(startScene: SceneClass): void {
     if (this.started) {
       throw new Error('Rain is already started');
     }
@@ -143,7 +144,7 @@ export class Rain {
     this.view.canvas.addEventListener('blur', () => this.blur());
     window.addEventListener('resize', () => this.resize(window.innerWidth, window.innerHeight));
 
-    this.states.changeTo(startState);
+    this.scenes.changeTo(startScene);
     requestAnimationFrame(() => {
       this.lastFrameTime = window.performance.now();
       this.loop();
@@ -152,12 +153,12 @@ export class Rain {
 
   focus(): void {
     this.inFocus = true;
-    this.states.focus();
+    this.scenes.focus();
   }
 
   blur(): void {
     this.inFocus = false;
-    this.states.blur();
+    this.scenes.blur();
   }
 
   resize(width: number, height: number): void {
@@ -167,7 +168,7 @@ export class Rain {
       this.view.scaleToFit();
       this.target = new RenderTarget(this.view.viewWidth, this.view.viewHeight);
     }
-    this.states.resize(width, height);
+    this.scenes.resize(width, height);
   }
 
   private loop(): void {
@@ -198,7 +199,7 @@ export class Rain {
     const clampedDt = clamp(deltaTime, 0, MAX_DT);
     this.time.update(clampedDt);
     this.input.update();
-    this.states.update(this.time.dt);
+    this.scenes.update(this.time.dt);
 
     this.draw();
   }
@@ -208,13 +209,15 @@ export class Rain {
     graphics.transform.identity();
 
     graphics.pushTarget(this.target);
-    this.states.draw(graphics);
+    this.scenes.draw(graphics);
     graphics.popTarget();
 
     graphics.transform.identity();
     graphics.color.set(1, 1, 1, 1);
 
     graphics.start();
+    graphics.transform.scale(this.view.viewScaleX, this.view.viewScaleY);
+
     graphics.drawRenderTarget(this.view.viewOffsetX, this.view.viewOffsetY, this.target);
     graphics.commit();
   }

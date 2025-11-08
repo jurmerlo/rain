@@ -140,8 +140,8 @@ export class ShapeRenderer extends BaseRenderer {
     }
 
     this.updateBuffer(p1X, p1Y, this.color, 0);
-    this.updateBuffer(p2X, p2Y, this.color, 0);
-    this.updateBuffer(p3X, p3Y, this.color, 0);
+    this.updateBuffer(p2X, p2Y, this.color, 1);
+    this.updateBuffer(p3X, p3Y, this.color, 2);
     this.index++;
   }
 

@@ -413,6 +413,30 @@ export class Mat4 {
     this.value[15] = mat.value[15];
   }
 
+  translate(x: number, y: number): void {
+    this.value[12] += x;
+    this.value[13] += y;
+  }
+
+  scale(x: number, y: number): void {
+    this.value[0] *= x;
+    this.value[1] *= y;
+    this.value[4] *= x;
+    this.value[5] *= y;
+    this.value[8] *= x;
+    this.value[9] *= y;
+  }
+
+  rotate(angle: number): void {
+    const c = Math.cos(angle);
+    const s = Math.sin(angle);
+
+    this.value[0] = c;
+    this.value[1] = s;
+    this.value[4] = -s;
+    this.value[5] = c;
+  }
+
   /**
    * Set an orthographic projection matrix.
    * @param params - The parameters for the orthographic projection.

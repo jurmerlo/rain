@@ -325,6 +325,8 @@ export class Graphics {
    */
   drawRenderTarget(x: number, y: number, target: RenderTarget): void {
     this.shapeRenderer.commit();
+    this.imageRenderer.color = this.color;
+    this.imageRenderer.transform = this.transform;
     this.imageRenderer.drawRenderTarget(x, y, target);
   }
 
@@ -336,6 +338,8 @@ export class Graphics {
    */
   drawBitmapText(x: number, y: number, font: BitmapFont, text: string): void {
     this.shapeRenderer.commit();
+    this.imageRenderer.color = this.color;
+    this.imageRenderer.transform = this.transform;
     this.imageRenderer.drawBitmapText(x, y, font, text);
   }
 

@@ -1,12 +1,12 @@
-import { type Assets, BitmapFont, Image, inject, State, type States } from '@rainengine/rain';
-import { GameState } from './gameState';
+import { type Assets, BitmapFont, Image, inject, Scene, type Scenes } from '@rainengine/rain';
+import { GameScene } from './gameScene';
 
-export class LoadState extends State {
+export class LoadState extends Scene {
   @inject()
   private readonly assets!: Assets;
 
   @inject()
-  private readonly states!: States;
+  private readonly scenes!: Scenes;
 
   constructor() {
     super();
@@ -24,7 +24,7 @@ export class LoadState extends State {
         },
       ])
       .then(() => {
-        this.states.changeTo(GameState);
+        this.scenes.changeTo(GameScene);
       });
   }
 }
