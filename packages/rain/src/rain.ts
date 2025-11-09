@@ -54,6 +54,10 @@ export class Rain {
 
   private time: Time;
 
+  private originalCanvasWidth: number;
+
+  private originalCanvasHeight: number;
+
   constructor({
     designWidth,
     designHeight,
@@ -68,6 +72,9 @@ export class Rain {
     title ??= 'Rain Game';
     canvasWidth ??= designWidth;
     canvasHeight ??= designHeight;
+    this.originalCanvasWidth = canvasWidth;
+    this.originalCanvasHeight = canvasHeight;
+
     this.runInBackground = runInBackground ?? false;
     targetFps ??= -1;
     hdpi ??= false;
@@ -93,7 +100,16 @@ export class Rain {
     canvas.style.width = `${canvasWidth}px`;
     canvas.style.height = `${canvasHeight}px`;
 
-    this.view = new View({ designWidth, designHeight, fillWindow, pixelRatio, canvas, targetFps });
+    this.view = new View({
+      designWidth,
+      designHeight,
+      fillWindow,
+      pixelRatio,
+      canvas,
+      targetFps,
+      resizefunc: this.resize.bind(this),
+    });
+
     addService('view', this.view);
 
     this.context = new GLContext(canvas);
@@ -165,9 +181,12 @@ export class Rain {
     if (this.view.fillWindow) {
       this.view.canvas.style.width = `${width}px`;
       this.view.canvas.style.height = `${height}px`;
-      this.view.scaleToFit();
-      this.target = new RenderTarget(this.view.viewWidth, this.view.viewHeight);
+    } else {
+      this.view.canvas.style.width = `${this.originalCanvasWidth}px`;
+      this.view.canvas.style.height = `${this.originalCanvasHeight}px`;
     }
+    this.view.scaleToFit();
+    this.target = new RenderTarget(this.view.viewWidth, this.view.viewHeight);
     this.scenes.resize(width, height);
   }
 

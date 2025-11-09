@@ -8,6 +8,7 @@ export type ViewOptions = {
   canvas: HTMLCanvasElement;
   targetFps: number;
   fillWindow: boolean;
+  resizefunc: (width: number, height: number) => void;
 };
 
 export class View {
@@ -19,7 +20,14 @@ export class View {
 
   debugRender = false;
 
-  fillWindow = false;
+  get fillWindow(): boolean {
+    return this._fillWindow;
+  }
+
+  set fillWindow(value: boolean) {
+    this._fillWindow = value;
+    this.resizeFunc(window.innerWidth, window.innerHeight);
+  }
 
   get designWidth(): number {
     return this.designSize.x;
@@ -106,12 +114,17 @@ export class View {
 
   private _scaleMode: ScaleMode;
 
-  constructor({ designWidth, designHeight, fillWindow, pixelRatio, canvas, targetFps }: ViewOptions) {
+  private _fillWindow: boolean;
+
+  private resizeFunc: (width: number, height: number) => void;
+
+  constructor({ designWidth, designHeight, fillWindow, pixelRatio, canvas, targetFps, resizefunc }: ViewOptions) {
     this.designSize.set(designWidth, designHeight);
     this.canvas = canvas;
     this.pixelRatio = pixelRatio;
     this.targetFps = targetFps;
-    this.fillWindow = fillWindow;
+    this._fillWindow = fillWindow;
+    this.resizeFunc = resizefunc;
 
     this._scaleMode = scaleModeFitView;
     this.scaleToFit();
