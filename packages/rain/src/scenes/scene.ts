@@ -12,6 +12,7 @@ export class Scene extends Entity {
 
   constructor() {
     super();
+    this.useTransform = false;
     this.cameras.push(new Camera());
   }
 

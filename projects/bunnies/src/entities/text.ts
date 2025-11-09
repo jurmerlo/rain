@@ -14,11 +14,12 @@ export class Text extends Entity {
   constructor() {
     super();
     this.font = this.assets.get(BitmapFont, 'kenny_pixel');
+    this.transform.position.set(10, 10);
   }
 
-  override draw(graphics: Graphics): void {
+  override drawWithTransform(graphics: Graphics): void {
     graphics.color.set(1, 1, 1, 1);
-    graphics.drawBitmapText(10, 10, this.font, `Bunnies: ${this.bunnyCount}`);
-    graphics.drawBitmapText(10, 40, this.font, `FPS: ${this.time.fps}`);
+    graphics.drawBitmapText(0, 0, this.font, `Bunnies: ${this.bunnyCount}`);
+    graphics.drawBitmapText(0, 30, this.font, `FPS: ${this.time.fps}`);
   }
 }

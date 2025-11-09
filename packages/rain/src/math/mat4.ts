@@ -1,3 +1,5 @@
+import { Vec2 } from './vec2.js';
+
 /** 4x4 matrix array so 16 items. */
 export type Mat4Value = [
   number,
@@ -435,6 +437,26 @@ export class Mat4 {
     this.value[1] = s;
     this.value[4] = -s;
     this.value[5] = c;
+  }
+
+  get2dTranslation(out?: Vec2): Vec2 {
+    const result = out ?? Vec2.get();
+    result.x = this.value[12];
+    result.y = this.value[13];
+
+    return result;
+  }
+
+  get2dScale(out?: Vec2): Vec2 {
+    const result = out ?? Vec2.get();
+    result.x = Math.sqrt(this.value[0] * this.value[0] + this.value[1] * this.value[1]);
+    result.y = Math.sqrt(this.value[4] * this.value[4] + this.value[5] * this.value[5]);
+
+    return result;
+  }
+
+  getZRotation(): number {
+    return Math.atan2(this.value[1], this.value[0]);
   }
 
   /**
