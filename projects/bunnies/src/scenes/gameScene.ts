@@ -1,4 +1,4 @@
-import { type Graphics, type Input, inject, Scene } from '@rainengine/rain';
+import { type Graphics, type Input, inject, Scene, type View } from '@rainengine/rain';
 import { Bunny } from '../entities/bunny';
 import { Text } from '../entities/text';
 import { BunnyLayer } from '../layers/bunnyLayer';
@@ -7,6 +7,9 @@ import { TextLayer } from '../layers/textLayer';
 export class GameScene extends Scene {
   @inject()
   private readonly input!: Input;
+
+  @inject()
+  private view!: View;
 
   private buttonDown: boolean;
 
@@ -48,6 +51,11 @@ export class GameScene extends Scene {
 
   override draw(graphics: Graphics): void {
     super.draw(graphics);
+  }
+
+  override resize(width: number, height: number): void {
+    super.resize(width, height);
+    this.mainCamera?.position.set(this.view.viewWidth * 0.5, this.view.viewHeight * 0.5);
   }
 
   private createBunny(): void {

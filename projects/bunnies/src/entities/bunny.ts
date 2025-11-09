@@ -40,13 +40,13 @@ export class Bunny extends Entity {
     this.color = this.random.color(0.2, 1, false);
   }
 
-  override update(_dt: number): void {
+  override update(dt: number): void {
     const position = this.transform.position;
 
-    position.x += this.speed.x;
-    position.y += this.speed.y;
-    this.speed.y += this.gravity;
-    this.transform.rotation += this.rotationSpeed;
+    position.x += this.speed.x * dt * 60;
+    position.y += this.speed.y * dt * 60;
+    this.speed.y += this.gravity * dt * 60;
+    this.transform.rotation += this.rotationSpeed * dt * 60;
 
     if (position.x > this.view.viewWidth) {
       position.x = this.view.viewWidth;
