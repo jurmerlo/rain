@@ -36,6 +36,8 @@ export class Bunny extends Entity {
 
   private color: Color;
 
+  private transform: Mat4;
+
   constructor() {
     super();
 
@@ -46,6 +48,7 @@ export class Bunny extends Entity {
     this.rotationSpeed = this.random.float(-4, 4);
     this.bunnyImage = this.assets.get(Image, 'bunny');
     this.color = this.random.color(0.2);
+    this.transform = new Mat4();
   }
 
   override update(_dt: number): void {
@@ -77,14 +80,10 @@ export class Bunny extends Entity {
 
   override draw(graphics: Graphics): void {
     graphics.color.copyFrom(this.color);
-    Mat4.from2dRotationTranslationScale(
-      toRad(this.rotation),
-      this.position.x,
-      this.position.y,
-      1,
-      1,
-      graphics.transform,
-    );
+    Mat4.from2dRotationTranslationScale(toRad(this.rotation), this.position.x, this.position.y, 1, 1, this.transform);
+    graphics.pushTransform();
+    graphics.applyTransform(this.transform);
     graphics.drawImage(-this.bunnyImage.width / 2, -this.bunnyImage.height / 2, this.bunnyImage);
+    graphics.popTransform();
   }
 }
