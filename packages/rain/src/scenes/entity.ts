@@ -22,9 +22,13 @@ export class Entity {
     this.useTransform = true;
   }
 
-  add(entity: Entity): void {
+  add(entity: Entity, index?: number): void {
     entity.parent = this;
-    this.entities.push(entity);
+    if (index !== undefined && index >= 0 && index < this.entities.length) {
+      this.entities.splice(index, 0, entity);
+    } else {
+      this.entities.push(entity);
+    }
   }
 
   remove(entity: Entity): void {

@@ -1,4 +1,5 @@
 import { Rectangle } from '../math/rectangle.js';
+import type { Graphics } from './graphics.js';
 import type { Image } from './image.js';
 
 type FrameSize = {
@@ -75,5 +76,27 @@ export class Atlas {
     }
 
     return this.frames[name];
+  }
+
+  // biome-ignore lint/nursery/useMaxParams: All parameters are necessary.
+  drawFrame(
+    graphics: Graphics,
+    name: string,
+    x: number,
+    y: number,
+    anchorX: number = 0.5,
+    anchorY: number = 0.5,
+  ): void {
+    const frame = this.getFrame(name);
+    if (!frame) {
+      return;
+    }
+
+    graphics.drawImage(
+      x - frame.sourceRect.width * anchorX + frame.sourceRect.x,
+      y - frame.sourceRect.height * anchorY + frame.sourceRect.y,
+      this.image,
+      frame.frame,
+    );
   }
 }
