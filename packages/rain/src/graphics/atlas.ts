@@ -4,15 +4,21 @@ import type { Image } from './image.js';
 type FrameSize = {
   x: number;
   y: number;
-  width: number;
-  height: number;
+  w: number;
+  h: number;
+};
+
+type SourceSize = {
+  w: number;
+  h: number;
 };
 
 type AtlasFrameInfo = {
   filename: string;
   trimmed: boolean;
   frame: FrameSize;
-  sourceSize: FrameSize;
+  sourceSize: SourceSize;
+  spriteSourceSize: FrameSize;
 };
 
 type AtlasData = {
@@ -29,17 +35,12 @@ export class AtlasFrame {
   readonly sourceRect: Rectangle;
 
   static fromJsonFrame(frameInfo: AtlasFrameInfo): AtlasFrame {
-    const frameRect = new Rectangle(
-      frameInfo.frame.x,
-      frameInfo.frame.y,
-      frameInfo.frame.width,
-      frameInfo.frame.height,
-    );
+    const frameRect = new Rectangle(frameInfo.frame.x, frameInfo.frame.y, frameInfo.frame.w, frameInfo.frame.h);
     const sourceRect = new Rectangle(
-      frameInfo.sourceSize.x,
-      frameInfo.sourceSize.y,
-      frameInfo.sourceSize.width,
-      frameInfo.sourceSize.height,
+      frameInfo.spriteSourceSize.x,
+      frameInfo.spriteSourceSize.y,
+      frameInfo.sourceSize.w,
+      frameInfo.sourceSize.h,
     );
 
     return new AtlasFrame(frameInfo.filename, frameRect, frameInfo.trimmed, sourceRect);
