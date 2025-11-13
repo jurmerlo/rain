@@ -1,4 +1,4 @@
-import { Color } from '@rainengine/rain/graphics';
+import { Color } from '@rain2d/rain/graphics';
 import type { Ease } from './easing.js';
 import { Tween } from './tween.js';
 

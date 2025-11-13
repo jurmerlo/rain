@@ -83,6 +83,12 @@ jobs:
       - name: Build @rain2d/rain
         run: pnpm --filter @rain2d/rain build
 
+      - name: Build @rain2d/view
+        run: pnpm --filter @rain2d/view build
+
+      - name: Build @rain2d/scenes
+        run: pnpm --filter @rain2d/scenes build
+
       # Bunnies Project
       - name: Build @rain2d-projects/bunnies
         run: pnpm --filter @rain2d-projects/bunnies build

@@ -1,4 +1,4 @@
-import { Vec2 } from '@rainengine/rain/math';
+import { Vec2 } from '@rain2d/rain/math';
 import type { Ease } from './easing.js';
 import { Tween } from './tween.js';
 
