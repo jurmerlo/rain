@@ -38,8 +38,6 @@ export class Rain {
 
   private lastFrameTime: number;
 
-  private context: GLContext;
-
   private graphics: Graphics;
 
   private started: boolean;
@@ -112,12 +110,12 @@ export class Rain {
 
     addService('view', this.view);
 
-    this.context = new GLContext(canvas);
-    addService('glContext', this.context);
+    const glContext = new GLContext(canvas);
+    addService('glContext', glContext);
 
     addService('audio', new Audio());
 
-    this.graphics = new Graphics(this.context, this.view);
+    this.graphics = new Graphics(glContext, this.view);
     addService('graphics', this.graphics);
 
     addService('random', new Random());

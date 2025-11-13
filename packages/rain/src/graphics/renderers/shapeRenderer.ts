@@ -43,15 +43,15 @@ export class ShapeRenderer extends BaseRenderer {
   /**
    * Create a new shape renderer.
    */
-  constructor(context: GLContext) {
-    super(context);
+  constructor(glContext: GLContext) {
+    super(glContext);
 
     this.tempVec3 = new Vec3();
 
-    this.vertexBuffer = context.gl.createBuffer();
+    this.vertexBuffer = glContext.gl.createBuffer();
     this.vertexIndices = new Float32Array(this.BUFFER_SIZE * TRIANGLE_OFFSET);
 
-    this.indexBuffer = context.gl.createBuffer();
+    this.indexBuffer = glContext.gl.createBuffer();
     this.indexIndices = new Int32Array(this.BUFFER_SIZE * VERTICES_PER_TRI);
 
     // The indices are the same for all triangles.
@@ -93,7 +93,7 @@ export class ShapeRenderer extends BaseRenderer {
     this.shader.use();
     this.shader.applyBlendMode();
 
-    const gl = this.context.gl;
+    const gl = this.glContext.gl;
     gl.uniformMatrix4fv(this.shader.uniforms.u_projectionMatrix, false, this.projection.value);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, this.vertexIndices, gl.DYNAMIC_DRAW);
@@ -368,7 +368,7 @@ export class ShapeRenderer extends BaseRenderer {
    * Create the default shader for the shape renderer.
    */
   private createDefaultShader(): void {
-    this.defaultShader = new Shader('shape', getShapeFragmentSource(this.context.isGL1));
+    this.defaultShader = new Shader('shape', getShapeFragmentSource(this.glContext.isGL1));
     this.shader = this.defaultShader;
   }
 }

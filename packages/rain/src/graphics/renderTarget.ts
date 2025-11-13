@@ -35,7 +35,7 @@ export class RenderTarget {
    * The WebGL rendering context.
    */
   @inject('glContext')
-  private context!: GLContext;
+  private glContext!: GLContext;
 
   /**
    * Create a new render target.
@@ -48,7 +48,7 @@ export class RenderTarget {
     this.projection = new Mat4();
     this.projection.ortho(0, width, height, 0, -1, 1);
 
-    const gl = this.context.gl;
+    const gl = this.glContext.gl;
 
     this.buffer = gl.createFramebuffer();
     this.texture = gl.createTexture();
@@ -56,10 +56,10 @@ export class RenderTarget {
     const tex2d = gl.TEXTURE_2D;
     gl.bindTexture(tex2d, this.texture);
     gl.texImage2D(tex2d, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, this.context.getGLTextureFilter('linear'));
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, this.context.getGLTextureFilter('linear'));
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, this.context.getGLTextureWrap('clamp to edge'));
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, this.context.getGLTextureWrap('clamp to edge'));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, this.glContext.getGLTextureFilter('linear'));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, this.glContext.getGLTextureFilter('linear'));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, this.glContext.getGLTextureWrap('clamp to edge'));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, this.glContext.getGLTextureWrap('clamp to edge'));
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.buffer);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, tex2d, this.texture, 0);
@@ -70,7 +70,7 @@ export class RenderTarget {
    * Destroy the render target.
    */
   destroy(): void {
-    const gl = this.context.gl;
+    const gl = this.glContext.gl;
     gl.deleteTexture(this.texture);
     this.texture = null;
 

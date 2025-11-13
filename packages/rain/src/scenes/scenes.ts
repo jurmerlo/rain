@@ -34,20 +34,7 @@ export class Scenes {
 
   draw(graphics: Graphics): void {
     if (this.currentScene?.active) {
-      const cameras = this.currentScene.cameras;
-
-      graphics.transform.identity();
-      for (const camera of cameras) {
-        camera.drawContent(graphics, this.currentScene.draw.bind(this.currentScene));
-      }
-
-      graphics.color.set(1, 1, 1, 1);
-      graphics.transform.identity();
-      graphics.start();
-      for (const camera of cameras) {
-        camera.drawSelf(graphics);
-      }
-      graphics.commit();
+      this.currentScene.draw(graphics);
     }
   }
 

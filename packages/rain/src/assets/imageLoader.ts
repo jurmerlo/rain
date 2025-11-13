@@ -1,5 +1,5 @@
 import { Image } from '../graphics/image.js';
-import { AssetLoader, type AssetLoaderLoadParams } from './assets.js';
+import { AssetLoader, type AssetLoaderLoadParams } from './assetLoader.js';
 
 export class ImageLoader extends AssetLoader<Image> {
   constructor() {

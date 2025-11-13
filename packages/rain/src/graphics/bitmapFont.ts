@@ -3,7 +3,7 @@ import type { Image } from './image.js';
 /**
  * Bitmap font character data.
  */
-export type BmFontChar = {
+export type BitmapFontChar = {
   /**
    * The character id.
    */
@@ -48,7 +48,7 @@ export type BmFontChar = {
 /**
  * Bitmap font kerning data.
  */
-export type BmKerning = {
+type BmKerning = {
   /**
    * The left character id.
    */
@@ -100,7 +100,7 @@ export class BitmapFont {
    * @param char - The char to check.
    * @returns The character render data.
    */
-  getCharData(char: string): BmFontChar | null {
+  getCharData(char: string): BitmapFontChar | null {
     return this.fontData.getCharData(char);
   }
 
@@ -142,7 +142,7 @@ export class BitmapFont {
   }
 }
 
-export class FontData {
+class FontData {
   /**
    * The height of the font in pixels.
    */
@@ -151,7 +151,7 @@ export class FontData {
   /**
    * The character data.
    */
-  private chars: Record<string, BmFontChar> = {};
+  private chars: Record<string, BitmapFontChar> = {};
 
   /**
    * The kerning data.
@@ -183,7 +183,7 @@ export class FontData {
       if (lineName === 'common') {
         height = this.getSegmentInfo(segments[1]);
       } else if (lineName === 'char') {
-        const character: BmFontChar = {
+        const character: BitmapFontChar = {
           id: this.getSegmentInfo(segments[1]),
           x: this.getSegmentInfo(segments[2]),
           y: this.getSegmentInfo(segments[3]),
@@ -210,7 +210,7 @@ export class FontData {
    * @param char - The character to check.
    * @returns The character data or null if the character does not exist in the font.
    */
-  getCharData(char: string): BmFontChar | null {
+  getCharData(char: string): BitmapFontChar | null {
     const id = char.charCodeAt(0);
 
     return this.chars[id] ?? null;

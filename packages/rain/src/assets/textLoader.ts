@@ -1,4 +1,4 @@
-import { AssetLoader, type AssetLoaderLoadParams } from './assets.js';
+import { AssetLoader, type AssetLoaderLoadParams } from './assetLoader.js';
 
 // biome-ignore lint/complexity/noBannedTypes: Need to be able to use String as a type.
 export class TextLoader extends AssetLoader<String> {

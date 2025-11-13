@@ -16,7 +16,7 @@ export class Audio {
   /**
    * The web audio context.
    */
-  readonly context: AudioContext;
+  readonly audioContext: AudioContext;
 
   /**
    * The main gain node that controls all volume.
@@ -42,16 +42,16 @@ export class Audio {
    * Create a new AudioManager instance.
    */
   constructor() {
-    this.context = new AudioContext();
-    this.mainGain = this.context.createGain();
-    this.mainGain.connect(this.context.destination);
+    this.audioContext = new AudioContext();
+    this.mainGain = this.audioContext.createGain();
+    this.mainGain.connect(this.audioContext.destination);
 
     this.audioChannels = [];
     this.prevVolume = 1;
     this.muted = false;
 
     for (let i = 0; i < 32; i++) {
-      this.audioChannels.push(new AudioChannel(this.context.createGain()));
+      this.audioChannels.push(new AudioChannel(this.audioContext.createGain()));
     }
   }
 
@@ -133,11 +133,11 @@ export class Audio {
       channel.stop();
     }
 
-    const source = this.context.createBufferSource();
+    const source = this.audioContext.createBufferSource();
     source.buffer = sound.buffer;
     source.connect(channel.gain);
     channel.gain.connect(this.mainGain);
-    channel.startTime = this.context.currentTime - startTime;
+    channel.startTime = this.audioContext.currentTime - startTime;
     source.start(0, startTime);
     channel.volume = volume;
 
@@ -153,7 +153,7 @@ export class Audio {
           }
 
           this.play({ sound, loop: channel.loop, volume: channel.volume, channelId: id });
-          channel.startTime = this.context.currentTime;
+          channel.startTime = this.audioContext.currentTime;
         } else if (channel.loop === 0) {
           channel.stop();
         }
@@ -185,7 +185,7 @@ export class Audio {
    * @param channelId - Optional channel id.
    */
   pause(channelId?: number): void {
-    const time = this.context.currentTime;
+    const time = this.audioContext.currentTime;
     const channels = channelId ? [this.audioChannels[channelId]] : this.audioChannels;
     for (const channel of channels) {
       channel.pause(time);
@@ -269,7 +269,7 @@ export class Audio {
    * @returns The created Sound or null if the buffer could not be decoded.
    */
   async decodeSound(id: string, buffer: ArrayBuffer): Promise<Sound | null> {
-    const data = await this.context.decodeAudioData(buffer);
+    const data = await this.audioContext.decodeAudioData(buffer);
     if (data) {
       return new Sound(id, data);
     }

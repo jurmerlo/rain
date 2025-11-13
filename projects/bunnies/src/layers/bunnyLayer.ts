@@ -1,4 +1,4 @@
-import { Entity } from '@rainengine/rain';
+import { Entity } from '@rainengine/rain/scenes';
 
 export class BunnyLayer extends Entity {
   constructor() {

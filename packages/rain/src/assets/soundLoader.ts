@@ -1,7 +1,7 @@
 import type { Audio } from '../audio/audio.js';
 import { Sound } from '../audio/sound.js';
 import { inject } from '../di/inject.js';
-import { AssetLoader, type AssetLoaderLoadParams } from './assets.js';
+import { AssetLoader, type AssetLoaderLoadParams } from './assetLoader.js';
 
 export class SoundLoader extends AssetLoader<Sound> {
   @inject()

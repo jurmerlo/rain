@@ -30,7 +30,7 @@ export class Image {
    * The WebGL rendering context.
    */
   @inject('glContext')
-  private context!: GLContext;
+  private glContext!: GLContext;
 
   /**
    * Create a new image.
@@ -83,7 +83,7 @@ export class Image {
    * Update the texture with the current image data. This should be called after modifying the image data with setPixel.
    */
   updateTexture(): void {
-    const gl = this.context.gl;
+    const gl = this.glContext.gl;
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.width, this.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.data);
     gl.bindTexture(gl.TEXTURE_2D, null);
@@ -93,7 +93,7 @@ export class Image {
    * Destroy the image and texture.
    */
   destroy(): void {
-    this.context.gl.deleteTexture(this.texture);
+    this.glContext.gl.deleteTexture(this.texture);
   }
 
   /**
@@ -101,6 +101,6 @@ export class Image {
    * @returns The new texture.
    */
   private createTexture(): WebGLTexture {
-    return this.context.gl.createTexture();
+    return this.glContext.gl.createTexture();
   }
 }

@@ -1,4 +1,8 @@
-import { type Graphics, type Input, inject, Scene, type View } from '@rainengine/rain';
+import { inject } from '@rainengine/rain/di';
+import type { Graphics } from '@rainengine/rain/graphics';
+import type { Input } from '@rainengine/rain/input';
+import { Scene } from '@rainengine/rain/scenes';
+import type { View } from '@rainengine/rain/view';
 import { Bunny } from '../entities/bunny';
 import { Text } from '../entities/text';
 import { BunnyLayer } from '../layers/bunnyLayer';

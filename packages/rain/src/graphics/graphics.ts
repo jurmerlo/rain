@@ -35,19 +35,19 @@ export class Graphics {
 
   private projection: Mat4;
 
-  private context: GLContext;
+  private glContext: GLContext;
 
   private view: View;
 
-  constructor(context: GLContext, view: View) {
-    this.context = context;
+  constructor(glContext: GLContext, view: View) {
+    this.glContext = glContext;
     this.view = view;
 
     this.projection = new Mat4();
     this.transformStack.push(new Mat4());
 
-    this.shapeRenderer = new ShapeRenderer(context);
-    this.imageRenderer = new ImageRenderer(context);
+    this.shapeRenderer = new ShapeRenderer(glContext);
+    this.imageRenderer = new ImageRenderer(glContext);
   }
 
   pushTarget(target: RenderTarget): void {
@@ -56,12 +56,12 @@ export class Graphics {
     }
 
     this.targetStack.push(target);
-    this.context.gl.bindFramebuffer(this.context.gl.FRAMEBUFFER, target.buffer);
+    this.glContext.gl.bindFramebuffer(this.glContext.gl.FRAMEBUFFER, target.buffer);
   }
 
   popTarget(): void {
     this.targetStack.pop();
-    const gl = this.context.gl;
+    const gl = this.glContext.gl;
 
     if (this.targetStack.length > 0) {
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.targetStack[this.targetStack.length - 1].buffer);
@@ -74,7 +74,7 @@ export class Graphics {
     while (this.targetStack.length > 0) {
       this.targetStack.pop();
     }
-    this.context.gl.bindFramebuffer(this.context.gl.FRAMEBUFFER, null);
+    this.glContext.gl.bindFramebuffer(this.glContext.gl.FRAMEBUFFER, null);
   }
 
   pushTransform(transform?: Mat4): void {
@@ -105,7 +105,7 @@ export class Graphics {
   }
 
   start(clear: boolean = true, newClearColor?: Color): void {
-    const gl = this.context.gl;
+    const gl = this.glContext.gl;
     let width = 0;
     let height = 0;
 
@@ -344,39 +344,39 @@ export class Graphics {
   }
 
   setBool(location: WebGLUniformLocation | null, value: boolean): void {
-    this.context.gl.uniform1i(location, value ? 1 : 0);
+    this.glContext.gl.uniform1i(location, value ? 1 : 0);
   }
 
   setInt(location: WebGLUniformLocation | null, value: number): void {
-    this.context.gl.uniform1i(location, value);
+    this.glContext.gl.uniform1i(location, value);
   }
 
   setInt2(location: WebGLUniformLocation | null, value1: number, value2: number): void {
-    this.context.gl.uniform2i(location, value1, value2);
+    this.glContext.gl.uniform2i(location, value1, value2);
   }
 
   setInt3(location: WebGLUniformLocation | null, value1: number, value2: number, value3: number): void {
-    this.context.gl.uniform3i(location, value1, value2, value3);
+    this.glContext.gl.uniform3i(location, value1, value2, value3);
   }
 
   setInt4(location: WebGLUniformLocation | null, value1: number, value2: number, value3: number, value4: number): void {
-    this.context.gl.uniform4i(location, value1, value2, value3, value4);
+    this.glContext.gl.uniform4i(location, value1, value2, value3, value4);
   }
 
   setInts(location: WebGLUniformLocation | null, value: Int32Array): void {
-    this.context.gl.uniform1iv(location, value);
+    this.glContext.gl.uniform1iv(location, value);
   }
 
   setFloat(location: WebGLUniformLocation | null, value: number): void {
-    this.context.gl.uniform1f(location, value);
+    this.glContext.gl.uniform1f(location, value);
   }
 
   setFloat2(location: WebGLUniformLocation | null, value1: number, value2: number): void {
-    this.context.gl.uniform2f(location, value1, value2);
+    this.glContext.gl.uniform2f(location, value1, value2);
   }
 
   setFloat3(location: WebGLUniformLocation | null, value1: number, value2: number, value3: number): void {
-    this.context.gl.uniform3f(location, value1, value2, value3);
+    this.glContext.gl.uniform3f(location, value1, value2, value3);
   }
 
   setFloat4(
@@ -386,19 +386,19 @@ export class Graphics {
     value3: number,
     value4: number,
   ): void {
-    this.context.gl.uniform4f(location, value1, value2, value3, value4);
+    this.glContext.gl.uniform4f(location, value1, value2, value3, value4);
   }
 
   setFloats(location: WebGLUniformLocation | null, value: Float32Array): void {
-    this.context.gl.uniform1fv(location, value);
+    this.glContext.gl.uniform1fv(location, value);
   }
 
   setMatrix(location: WebGLUniformLocation | null, value: Mat4): void {
-    this.context.gl.uniformMatrix4fv(location, false, value.value);
+    this.glContext.gl.uniformMatrix4fv(location, false, value.value);
   }
 
   setTexture(unit: number, value?: Image): void {
-    const gl = this.context.gl;
+    const gl = this.glContext.gl;
     gl.activeTexture(gl.TEXTURE0 + unit);
     if (value) {
       gl.bindTexture(gl.TEXTURE_2D, value.texture);

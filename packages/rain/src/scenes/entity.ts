@@ -39,15 +39,17 @@ export class Entity {
   }
 
   update(dt: number): void {
-    for (const entity of this.entitiesToRemove) {
-      entity.destroy();
-      const index = this.entities.indexOf(entity);
-      if (index !== -1) {
-        this.entities.splice(index, 1);
+    while (this.entitiesToRemove.length > 0) {
+      const entity = this.entitiesToRemove.pop();
+      if (entity) {
+        entity.destroy();
+        const index = this.entities.indexOf(entity);
+        if (index !== -1) {
+          this.entities.splice(index, 1);
+        }
       }
     }
 
-    this.entitiesToRemove.length = 0;
     for (const entity of this.entities) {
       if (entity.active) {
         entity.update(dt);
