@@ -1,4 +1,8 @@
-import { type Assets, BitmapFont, Entity, type Graphics, inject, type Time } from '@rainengine/rain';
+import type { Assets } from '@rainengine/rain/assets';
+import { inject } from '@rainengine/rain/di';
+import { BitmapFont, type Graphics } from '@rainengine/rain/graphics';
+import { Entity } from '@rainengine/rain/scenes';
+import type { Time } from '@rainengine/rain/utils';
 
 export class Text extends Entity {
   bunnyCount: number = 0;

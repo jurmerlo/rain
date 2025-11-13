@@ -1,7 +1,7 @@
 import { type EmitHandler, Emitter } from '../emitter/emitter.js';
 import { getKeyCodeFromString, type KeyCode } from './keyCode.js';
 
-export type GamepadState = {
+type GamepadState = {
   axes: Record<number, number>;
   buttons: Record<number, number>;
 };

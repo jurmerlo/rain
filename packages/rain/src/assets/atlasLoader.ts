@@ -1,7 +1,8 @@
-import { inject } from '../di/inject.js';
+import { inject } from '../di/index.js';
 import { Atlas } from '../graphics/atlas.js';
 import { Image } from '../graphics/image.js';
-import { AssetLoader, type AssetLoaderLoadParams, type Assets } from './assets.js';
+import { AssetLoader, type AssetLoaderLoadParams } from './assetLoader.js';
+import type { Assets } from './assets.js';
 
 export class AtlasLoader extends AssetLoader<Atlas> {
   @inject()

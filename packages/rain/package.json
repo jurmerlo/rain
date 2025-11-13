@@ -7,6 +7,50 @@
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
+    },
+    "./assets": {
+      "import": "./dist/assets/index.js",
+      "types": "./dist/assets/index.d.ts"
+    },
+    "./audio": {
+      "import": "./dist/audio/index.js",
+      "types": "./dist/audio/index.d.ts"
+    },
+    "./di": {
+      "import": "./dist/di/index.js",
+      "types": "./dist/di/index.d.ts"
+    },
+    "./emitter": {
+      "import": "./dist/emitter/index.js",
+      "types": "./dist/emitter/index.d.ts"
+    },
+    "./graphics": {
+      "import": "./dist/graphics/index.js",
+      "types": "./dist/graphics/index.d.ts"
+    },
+    "./input": {
+      "import": "./dist/input/index.js",
+      "types": "./dist/input/index.d.ts"
+    },
+    "./math": {
+      "import": "./dist/math/index.js",
+      "types": "./dist/math/index.d.ts"
+    },
+    "./scenes": {
+      "import": "./dist/scenes/index.js",
+      "types": "./dist/scenes/index.d.ts"
+    },
+    "./tween": {
+      "import": "./dist/tween/index.js",
+      "types": "./dist/tween/index.d.ts"
+    },
+    "./utils": {
+      "import": "./dist/utils/index.js",
+      "types": "./dist/utils/index.d.ts"
+    },
+    "./view": {
+      "import": "./dist/view/index.js",
+      "types": "./dist/view/index.d.ts"
     }
   },
   "files": [
