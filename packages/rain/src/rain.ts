@@ -8,30 +8,39 @@ import { Audio } from './audio/audio.js';
 import { addService } from './di/services.js';
 import { GLContext } from './graphics/glContext.js';
 import { Graphics } from './graphics/graphics.js';
-import { RenderTarget } from './graphics/renderTarget.js';
 import { Input } from './input/input.js';
 import { clamp } from './math/mathUtils.js';
 import { Random } from './math/random.js';
-import type { SceneClass } from './scenes/scene.js';
-import { Scenes } from './scenes/scenes.js';
 import { Time } from './utils/time.js';
-import { View } from './view/view.js';
 
 export type RainOptions = {
-  designWidth: number;
-  designHeight: number;
-  canvasWidth?: number;
-  canvasHeight?: number;
+  width?: number;
+  height?: number;
   title?: string;
+  hdpi?: boolean;
   targetFps?: number;
   runInBackground?: boolean;
-  hdpi?: boolean;
-  fillWindow?: boolean;
+};
+
+type Callbacks = {
+  update?: (deltaTime: number) => void;
+  draw?: (graphics: Graphics) => void;
+  focus?: () => void;
+  blur?: () => void;
+  resize?: (width: number, height: number) => void;
 };
 
 const MAX_DT: number = 1.0 / 15;
 
 export class Rain {
+  readonly callbacks: Callbacks;
+
+  readonly targetFps: number;
+
+  readonly hdpi: boolean;
+
+  readonly pixelRatio: number;
+
   private input: Input;
 
   private runInBackground: boolean;
@@ -44,78 +53,44 @@ export class Rain {
 
   private inFocus: boolean;
 
-  private scenes: Scenes;
-
-  private view: View;
-
-  private target: RenderTarget;
-
   private time: Time;
 
-  private originalCanvasWidth: number;
-
-  private originalCanvasHeight: number;
-
   constructor({
-    designWidth,
-    designHeight,
-    canvasWidth,
-    canvasHeight,
-    title,
-    targetFps,
-    runInBackground,
-    hdpi,
-    fillWindow,
+    width = 800,
+    height = 600,
+    title = 'Rain Game',
+    hdpi = true,
+    targetFps = -1,
+    runInBackground = false,
   }: RainOptions) {
-    title ??= 'Rain Game';
-    canvasWidth ??= designWidth;
-    canvasHeight ??= designHeight;
-    this.originalCanvasWidth = canvasWidth;
-    this.originalCanvasHeight = canvasHeight;
+    this.callbacks = {};
 
-    this.runInBackground = runInBackground ?? false;
-    targetFps ??= -1;
-    hdpi ??= false;
-    fillWindow ??= false;
-    if (fillWindow) {
-      canvasWidth = window.innerWidth;
-      canvasHeight = window.innerHeight;
-    }
+    this.runInBackground = runInBackground;
+    this.targetFps = targetFps;
+    this.hdpi = hdpi;
 
     document.title = title;
     const canvasId = 'rain';
 
-    const pixelRatio = hdpi ? window.devicePixelRatio : 1;
+    this.pixelRatio = hdpi ? window.devicePixelRatio : 1;
     const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
 
     if (!canvas) {
       throw new Error(`Canvas element with id "${canvasId}" not found`);
     }
 
-    canvas.width = canvasWidth * pixelRatio;
-    canvas.height = canvasHeight * pixelRatio;
+    canvas.width = width * this.pixelRatio;
+    canvas.height = height * this.pixelRatio;
 
-    canvas.style.width = `${canvasWidth}px`;
-    canvas.style.height = `${canvasHeight}px`;
-
-    this.view = new View({
-      designWidth,
-      designHeight,
-      fillWindow,
-      pixelRatio,
-      canvas,
-      targetFps,
-      resizefunc: this.resize.bind(this),
-    });
-
-    addService('view', this.view);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
 
     const glContext = new GLContext(canvas);
     addService('glContext', glContext);
 
     addService('audio', new Audio());
 
-    this.graphics = new Graphics(glContext, this.view);
+    this.graphics = new Graphics(glContext);
     addService('graphics', this.graphics);
 
     addService('random', new Random());
@@ -126,9 +101,6 @@ export class Rain {
     const assets = new Assets();
     addService('assets', assets);
 
-    this.scenes = new Scenes();
-    addService('scenes', this.scenes);
-
     this.time = new Time();
     addService('time', this.time);
 
@@ -138,27 +110,25 @@ export class Rain {
     assets.registerLoader(new SoundLoader());
     assets.registerLoader(new TextLoader());
 
-    this.target = new RenderTarget(this.view.viewWidth, this.view.viewHeight);
+    canvas.addEventListener('focus', () => this.focus());
+    canvas.addEventListener('blur', () => this.blur());
+    window.addEventListener('resize', () => this.resize(window.innerWidth, window.innerHeight));
+
+    canvas.focus();
+    this.inFocus = true;
 
     this.started = false;
     this.lastFrameTime = 0;
-    this.inFocus = false;
   }
 
-  start(startScene: SceneClass): void {
+  start(): void {
     if (this.started) {
       throw new Error('Rain is already started');
     }
     this.started = true;
 
-    this.view.canvas.focus();
     this.inFocus = true;
 
-    this.view.canvas.addEventListener('focus', () => this.focus());
-    this.view.canvas.addEventListener('blur', () => this.blur());
-    window.addEventListener('resize', () => this.resize(window.innerWidth, window.innerHeight));
-
-    this.scenes.changeTo(startScene);
     requestAnimationFrame(() => {
       this.lastFrameTime = window.performance.now();
       this.loop();
@@ -166,26 +136,34 @@ export class Rain {
   }
 
   focus(): void {
+    if (!this.started) {
+      return;
+    }
+
     this.inFocus = true;
-    this.scenes.focus();
+    if (this.callbacks.focus) {
+      this.callbacks.focus();
+    }
   }
 
   blur(): void {
+    if (!this.started) {
+      return;
+    }
     this.inFocus = false;
-    this.scenes.blur();
+    if (this.callbacks.blur) {
+      this.callbacks.blur();
+    }
   }
 
   resize(width: number, height: number): void {
-    if (this.view.fillWindow) {
-      this.view.canvas.style.width = `${width}px`;
-      this.view.canvas.style.height = `${height}px`;
-    } else {
-      this.view.canvas.style.width = `${this.originalCanvasWidth}px`;
-      this.view.canvas.style.height = `${this.originalCanvasHeight}px`;
+    if (!this.started) {
+      return;
     }
-    this.view.scaleToFit();
-    this.target = new RenderTarget(this.view.viewWidth, this.view.viewHeight);
-    this.scenes.resize(width, height);
+
+    if (this.callbacks.resize) {
+      this.callbacks.resize(width, height);
+    }
   }
 
   private loop(): void {
@@ -193,11 +171,11 @@ export class Rain {
 
     const now = window.performance.now();
     const timePassed = now - this.lastFrameTime;
-    if (this.view.targetFps === -1) {
+    if (this.targetFps === -1) {
       this.update(timePassed / 1000.0);
       this.lastFrameTime = now;
     } else {
-      const interval = 1.0 / this.view.targetFps;
+      const interval = 1.0 / this.targetFps;
       if (timePassed < interval) {
         return;
       }
@@ -213,29 +191,19 @@ export class Rain {
       return;
     }
 
-    const clampedDt = clamp(deltaTime, 0, MAX_DT);
-    this.time.update(clampedDt);
+    const clampedDeltaTime = clamp(deltaTime, 0, MAX_DT);
+    this.time.update(clampedDeltaTime);
     this.input.update();
-    this.scenes.update(this.time.dt);
+    if (this.callbacks.update) {
+      this.callbacks.update(this.time.deltaTime);
+    }
 
     this.draw();
   }
 
   private draw(): void {
-    const graphics = this.graphics;
-    graphics.transform.identity();
-
-    graphics.pushTarget(this.target);
-    this.scenes.draw(graphics);
-    graphics.popTarget();
-
-    graphics.transform.identity();
-    graphics.color.set(1, 1, 1, 1);
-
-    graphics.start();
-    graphics.transform.scale(this.view.viewScaleX, this.view.viewScaleY);
-
-    graphics.drawRenderTarget(this.view.viewOffsetX, this.view.viewOffsetY, this.target);
-    graphics.commit();
+    if (this.callbacks.draw) {
+      this.callbacks.draw(this.graphics);
+    }
   }
 }

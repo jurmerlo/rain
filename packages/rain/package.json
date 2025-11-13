@@ -1,5 +1,5 @@
 {
-  "name": "@rainengine/rain",
+  "name": "@rain2d/rain",
   "version": "0.1.0",
   "description": "",
   "type": "module",
@@ -36,21 +36,9 @@
       "import": "./dist/math/index.js",
       "types": "./dist/math/index.d.ts"
     },
-    "./scenes": {
-      "import": "./dist/scenes/index.js",
-      "types": "./dist/scenes/index.d.ts"
-    },
-    "./tween": {
-      "import": "./dist/tween/index.js",
-      "types": "./dist/tween/index.d.ts"
-    },
     "./utils": {
       "import": "./dist/utils/index.js",
       "types": "./dist/utils/index.d.ts"
-    },
-    "./view": {
-      "import": "./dist/view/index.js",
-      "types": "./dist/view/index.d.ts"
     }
   },
   "files": [

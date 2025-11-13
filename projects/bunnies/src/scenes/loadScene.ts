@@ -1,7 +1,7 @@
-import type { Assets } from '@rainengine/rain/assets';
-import { inject } from '@rainengine/rain/di';
-import { BitmapFont, Image } from '@rainengine/rain/graphics';
-import { Scene, type Scenes } from '@rainengine/rain/scenes';
+import type { Assets } from '@rain2d/rain/assets';
+import { inject } from '@rain2d/rain/di';
+import { BitmapFont, Image } from '@rain2d/rain/graphics';
+import { Scene, type Scenes } from '@rain2d/scenes';
 import { GameScene } from './gameScene';
 
 export class LoadState extends Scene {

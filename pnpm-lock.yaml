@@ -33,11 +33,56 @@ importers:
         specifier: 'catalog:'
         version: 4.0.8
 
+  packages/scenes:
+    devDependencies:
+      '@rain2d/rain':
+        specifier: workspace:*
+        version: link:../rain
+      '@rain2d/view':
+        specifier: workspace:*
+        version: link:../view
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vitest:
+        specifier: 'catalog:'
+        version: 4.0.8
+
+  packages/tweening:
+    devDependencies:
+      '@rain2d/rain':
+        specifier: workspace:*
+        version: link:../rain
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vitest:
+        specifier: 'catalog:'
+        version: 4.0.8
+
+  packages/view:
+    devDependencies:
+      '@rain2d/rain':
+        specifier: workspace:*
+        version: link:../rain
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vitest:
+        specifier: 'catalog:'
+        version: 4.0.8
+
   projects/bunnies:
     dependencies:
-      '@rainengine/rain':
+      '@rain2d/rain':
         specifier: workspace:*
         version: link:../../packages/rain
+      '@rain2d/scenes':
+        specifier: workspace:*
+        version: link:../../packages/scenes
+      '@rain2d/view':
+        specifier: workspace:*
+        version: link:../../packages/view
     devDependencies:
       typescript:
         specifier: 'catalog:'

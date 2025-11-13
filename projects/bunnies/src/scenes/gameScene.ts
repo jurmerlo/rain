@@ -1,8 +1,8 @@
-import { inject } from '@rainengine/rain/di';
-import type { Graphics } from '@rainengine/rain/graphics';
-import type { Input } from '@rainengine/rain/input';
-import { Scene } from '@rainengine/rain/scenes';
-import type { View } from '@rainengine/rain/view';
+import { inject } from '@rain2d/rain/di';
+import type { Graphics } from '@rain2d/rain/graphics';
+import type { Input } from '@rain2d/rain/input';
+import { Scene } from '@rain2d/scenes';
+import type { View } from '@rain2d/view';
 import { Bunny } from '../entities/bunny';
 import { Text } from '../entities/text';
 import { BunnyLayer } from '../layers/bunnyLayer';

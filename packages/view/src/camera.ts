@@ -1,11 +1,6 @@
-import { inject } from '../di/inject.js';
-import { Color } from '../graphics/color.js';
-import type { Graphics } from '../graphics/graphics.js';
-import { RenderTarget } from '../graphics/renderTarget.js';
-import { Mat4 } from '../math/mat4.js';
-import { clamp, rotateAround, toRad } from '../math/mathUtils.js';
-import { Rectangle } from '../math/rectangle.js';
-import { Vec2 } from '../math/vec2.js';
+import { inject } from '@rain2d/rain/di';
+import { Color, type Graphics, RenderTarget } from '@rain2d/rain/graphics';
+import { clamp, Mat4, Rectangle, rotateAround, toRad, Vec2 } from '@rain2d/rain/math';
 import type { View } from './view.js';
 
 /**

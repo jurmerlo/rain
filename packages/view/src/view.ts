@@ -1,24 +1,13 @@
-import { Vec2 } from '../math/vec2.js';
+import { inject } from '@rain2d/rain/di';
+import { type GLContext, RenderTarget } from '@rain2d/rain/graphics';
+import { Vec2 } from '@rain2d/rain/math';
+import type { Graphics } from '../../rain/dist/graphics/graphics.js';
 import { type ScaleMode, scaleModeFitView } from './scaleModes.js';
-
-export type ViewOptions = {
-  designWidth: number;
-  designHeight: number;
-  pixelRatio: number;
-  canvas: HTMLCanvasElement;
-  targetFps: number;
-  fillWindow: boolean;
-  resizefunc: (width: number, height: number) => void;
-};
 
 export class View {
   readonly pixelRatio: number;
 
-  readonly canvas: HTMLCanvasElement;
-
-  targetFps: number;
-
-  debugRender = false;
+  target: RenderTarget;
 
   get fillWindow(): boolean {
     return this._fillWindow;
@@ -26,7 +15,7 @@ export class View {
 
   set fillWindow(value: boolean) {
     this._fillWindow = value;
-    this.resizeFunc(window.innerWidth, window.innerHeight);
+    this.resize(window.innerWidth, window.innerHeight);
   }
 
   get designWidth(): number {
@@ -91,7 +80,7 @@ export class View {
 
   set scaleMode(mode: ScaleMode) {
     this._scaleMode = mode;
-    this.scaleToFit();
+    this.resize(window.innerWidth, window.innerHeight);
   }
 
   get viewAnchorX(): number {
@@ -101,6 +90,8 @@ export class View {
   get viewAnchorY(): number {
     return this.viewAnchor.y;
   }
+
+  private canvas: HTMLCanvasElement;
 
   private designSize = new Vec2();
 
@@ -116,18 +107,25 @@ export class View {
 
   private _fillWindow: boolean;
 
-  private resizeFunc: (width: number, height: number) => void;
+  private originalCanvasSize: Vec2;
 
-  constructor({ designWidth, designHeight, fillWindow, pixelRatio, canvas, targetFps, resizefunc }: ViewOptions) {
+  @inject()
+  private readonly glContext!: GLContext;
+
+  constructor(designWidth: number, designHeight: number, fillWindow: boolean, pixelRatio: number) {
     this.designSize.set(designWidth, designHeight);
-    this.canvas = canvas;
+    this.canvas = this.glContext.canvas;
+    this.originalCanvasSize = new Vec2(this.canvas.width, this.canvas.height);
     this.pixelRatio = pixelRatio;
-    this.targetFps = targetFps;
     this._fillWindow = fillWindow;
-    this.resizeFunc = resizefunc;
+    if (fillWindow) {
+      this.canvas.style.width = `${window.innerWidth}px`;
+      this.canvas.style.height = `${window.innerHeight}px`;
+    }
 
     this._scaleMode = scaleModeFitView;
     this.scaleToFit();
+    this.target = new RenderTarget(this.viewWidth, this.viewHeight);
   }
 
   scaleToFit(): void {
@@ -148,10 +146,39 @@ export class View {
     this.viewSize.set(viewWidth, viewHeight);
     this.viewScale.set(scaleFactorX, scaleFactorY);
     this.viewOffset.set(offsetX, offsetY);
+    this.target = new RenderTarget(this.viewWidth, this.viewHeight);
   }
 
   setViewAnchor(x: number, y: number): void {
     this.viewAnchor.set(x, y);
+  }
+
+  resize(width: number, height: number): void {
+    if (this.fillWindow) {
+      this.canvas.style.width = `${width}px`;
+      this.canvas.style.height = `${height}px`;
+    } else {
+      this.canvas.style.width = `${this.originalCanvasSize.x}px`;
+      this.canvas.style.height = `${this.originalCanvasSize.y}px`;
+    }
     this.scaleToFit();
+  }
+
+  setAsTarget(graphics: Graphics): void {
+    graphics.pushTarget(this.target);
+  }
+
+  drawTarget(graphics: Graphics): void {
+    if (graphics.target === this.target) {
+      graphics.popTarget();
+    }
+
+    graphics.transform.identity();
+    graphics.color.set(1, 1, 1, 1);
+
+    graphics.start();
+    graphics.transform.scale(this.viewScaleX, this.viewScaleY);
+    graphics.drawRenderTarget(this.viewOffsetX, this.viewOffsetY, this.target);
+    graphics.commit();
   }
 }

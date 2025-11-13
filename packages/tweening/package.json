@@ -1,0 +1,31 @@
+{
+  "name": "@rain2d/tweening",
+  "version": "0.1.0",
+  "description": "",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest run"
+  },
+  "keywords": [],
+  "author": "Jurmerlo",
+  "license": "MIT",
+  "packageManager": "pnpm@10.20.0",
+  "peerDependencies": {
+    "@rain2d/rain": "workspace:*"
+  },
+  "devDependencies": {
+    "@rain2d/rain": "workspace:*",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

@@ -1,5 +1,5 @@
-import type { Graphics } from '../graphics/graphics.js';
-import { Transform } from '../math/transform.js';
+import type { Graphics } from '@rain2d/rain/graphics';
+import { Transform } from '@rain2d/rain/math';
 
 export class Entity {
   active: boolean;
