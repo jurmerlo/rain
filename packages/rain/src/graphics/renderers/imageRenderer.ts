@@ -61,18 +61,18 @@ export class ImageRenderer extends BaseRenderer {
 
   /**
    * Create a new image renderer.
-   * @param context - The WebGL rendering context.
+   * @param glContext - The WebGL rendering context.
    */
-  constructor(context: GLContext) {
-    super(context);
+  constructor(glContext: GLContext) {
+    super(glContext);
 
     this.tempVec3 = new Vec3();
     this.tempFrame = new Rectangle();
 
-    this.vertexBuffer = this.context.gl.createBuffer();
+    this.vertexBuffer = this.glContext.gl.createBuffer();
     this.vertexIndices = new Float32Array(this.BUFFER_SIZE * QUAD_OFFSET);
 
-    this.indexBuffer = this.context.gl.createBuffer();
+    this.indexBuffer = this.glContext.gl.createBuffer();
     this.indexIndices = new Int32Array(this.BUFFER_SIZE * INDICES_PER_QUAD);
 
     for (let i = 0; i < this.indexIndices.length; i++) {
@@ -118,7 +118,7 @@ export class ImageRenderer extends BaseRenderer {
     this.shader.use();
     this.shader.applyBlendMode();
 
-    const gl = this.context.gl;
+    const gl = this.glContext.gl;
     gl.uniformMatrix4fv(this.shader.uniforms.u_projectionMatrix, false, this.projection.value);
     gl.activeTexture(gl.TEXTURE0);
     if (this.currentTarget) {
@@ -380,7 +380,7 @@ export class ImageRenderer extends BaseRenderer {
    * Create the default shader for the image renderer.
    */
   private createDefaultShader(): void {
-    this.defaultShader = new Shader('image', getImageFragmentSource(this.context.isGL1));
+    this.defaultShader = new Shader('image', getImageFragmentSource(this.glContext.isGL1));
     this.shader = this.defaultShader;
   }
 }

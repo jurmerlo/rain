@@ -59,14 +59,14 @@ export class BaseRenderer {
   /**
    * The WebGL rendering context
    */
-  protected context: GLContext;
+  protected glContext: GLContext;
 
   /**
    * Create a new base renderer.
-   * @param context - The WebGL rendering context.
+   * @param glContext - The WebGL rendering context.
    */
-  constructor(context: GLContext) {
-    this.context = context;
+  constructor(glContext: GLContext) {
+    this.glContext = glContext;
     this.projection = new Mat4();
     this.color = new Color(1, 1, 1, 1);
     this.transform = new Mat4();

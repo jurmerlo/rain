@@ -52,7 +52,7 @@ export class Shader {
    * The WebGL rendering context.
    */
   @inject('glContext')
-  private context!: GLContext;
+  private glContext!: GLContext;
 
   /**
    * The shader program.
@@ -72,9 +72,9 @@ export class Shader {
   constructor(type: ShaderType, source: string) {
     this.type = type;
     this.uniforms = {};
-    const gl = this.context.gl;
+    const gl = this.glContext.gl;
 
-    this.anisotropicFilter = this.context.gl.getExtension('EXT_texture_filter_anisotropic');
+    this.anisotropicFilter = this.glContext.gl.getExtension('EXT_texture_filter_anisotropic');
 
     const vertexShader = type === 'shape' ? this.getShapeVertShader() : this.getImageVertShader();
     const fragmentShader = this.createShader(gl.FRAGMENT_SHADER, source);
@@ -117,7 +117,7 @@ export class Shader {
    * Use the shader program.
    */
   use(): void {
-    this.context.gl.useProgram(this.program);
+    this.glContext.gl.useProgram(this.program);
   }
 
   /**
@@ -126,7 +126,7 @@ export class Shader {
    * @returns The uniform location or null if it does not exist.
    */
   getUniformLocation(id: string): WebGLUniformLocation | null {
-    return this.program ? this.context.gl.getUniformLocation(this.program, id) : null;
+    return this.program ? this.glContext.gl.getUniformLocation(this.program, id) : null;
   }
 
   /**
@@ -134,21 +134,21 @@ export class Shader {
    * @param textUnit - The texture unit to apply the parameters to.
    */
   applyTextureParameters(textUnit: number): void {
-    const gl = this.context.gl;
+    const gl = this.glContext.gl;
     gl.activeTexture(gl.TEXTURE0 + textUnit);
 
     const tex2d = gl.TEXTURE_2D;
-    gl.texParameteri(tex2d, gl.TEXTURE_WRAP_S, this.context.getGLTextureWrap(this.textureParameters.uWrap));
-    gl.texParameteri(tex2d, gl.TEXTURE_WRAP_T, this.context.getGLTextureWrap(this.textureParameters.vWrap));
+    gl.texParameteri(tex2d, gl.TEXTURE_WRAP_S, this.glContext.getGLTextureWrap(this.textureParameters.uWrap));
+    gl.texParameteri(tex2d, gl.TEXTURE_WRAP_T, this.glContext.getGLTextureWrap(this.textureParameters.vWrap));
     gl.texParameteri(
       tex2d,
       gl.TEXTURE_MIN_FILTER,
-      this.context.getGLTextureFilter(this.textureParameters.minFilter, this.textureParameters.mipmap),
+      this.glContext.getGLTextureFilter(this.textureParameters.minFilter, this.textureParameters.mipmap),
     );
     gl.texParameteri(
       tex2d,
       gl.TEXTURE_MAG_FILTER,
-      this.context.getGLTextureFilter(this.textureParameters.magFilter, this.textureParameters.mipmap),
+      this.glContext.getGLTextureFilter(this.textureParameters.magFilter, this.textureParameters.mipmap),
     );
 
     if (this.textureParameters.minFilter === 'anisotropic' && this.anisotropicFilter) {
@@ -160,20 +160,20 @@ export class Shader {
    * Apply the shader blend mode.
    */
   applyBlendMode(): void {
-    const gl = this.context.gl;
+    const gl = this.glContext.gl;
     if (this.blendParameters.source === 'blend one' && this.blendParameters.destination === 'blend zero') {
       gl.disable(gl.BLEND);
     } else {
       gl.enable(gl.BLEND);
       gl.blendFuncSeparate(
-        this.context.getGLBlendMode(this.blendParameters.source),
-        this.context.getGLBlendMode(this.blendParameters.destination),
-        this.context.getGLBlendMode(this.blendParameters.alphaSource),
-        this.context.getGLBlendMode(this.blendParameters.alphaDestination),
+        this.glContext.getGLBlendMode(this.blendParameters.source),
+        this.glContext.getGLBlendMode(this.blendParameters.destination),
+        this.glContext.getGLBlendMode(this.blendParameters.alphaSource),
+        this.glContext.getGLBlendMode(this.blendParameters.alphaDestination),
       );
       gl.blendEquationSeparate(
-        this.context.getGLBlendOperation(this.blendParameters.operation),
-        this.context.getGLBlendOperation(this.blendParameters.alphaOperation),
+        this.glContext.getGLBlendOperation(this.blendParameters.operation),
+        this.glContext.getGLBlendOperation(this.blendParameters.alphaOperation),
       );
     }
   }
@@ -182,14 +182,14 @@ export class Shader {
    * Destroy the shader.
    */
   destroy(): void {
-    this.context.gl.deleteProgram(this.program);
+    this.glContext.gl.deleteProgram(this.program);
   }
 
   private getShapeVertShader(): WebGLShader {
     if (!Shader.shapeVertShader) {
       Shader.shapeVertShader = this.createShader(
-        this.context.gl.VERTEX_SHADER,
-        getShapeVertexSource(this.context.isGL1),
+        this.glContext.gl.VERTEX_SHADER,
+        getShapeVertexSource(this.glContext.isGL1),
       );
     }
 
@@ -199,8 +199,8 @@ export class Shader {
   private getImageVertShader(): WebGLShader {
     if (!Shader.imageVertShader) {
       Shader.imageVertShader = this.createShader(
-        this.context.gl.VERTEX_SHADER,
-        getImageVertexSource(this.context.isGL1),
+        this.glContext.gl.VERTEX_SHADER,
+        getImageVertexSource(this.glContext.isGL1),
       );
     }
 
@@ -214,7 +214,7 @@ export class Shader {
    * @returns The compiled shader.
    */
   private createShader(type: number, source: string): WebGLShader {
-    const gl = this.context.gl;
+    const gl = this.glContext.gl;
     const shader = gl.createShader(type);
     if (!shader) {
       throw new Error('Unable to create shader.');
