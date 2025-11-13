@@ -1,9 +1,9 @@
-import type { Assets } from '@rainengine/rain/assets';
-import { inject } from '@rainengine/rain/di';
-import { type Color, type Graphics, Image } from '@rainengine/rain/graphics';
-import { type Random, Vec2 } from '@rainengine/rain/math';
-import { Entity } from '@rainengine/rain/scenes';
-import type { View } from '@rainengine/rain/view';
+import type { Assets } from '@rain2d/rain/assets';
+import { inject } from '@rain2d/rain/di';
+import { type Color, type Graphics, Image } from '@rain2d/rain/graphics';
+import { type Random, Vec2 } from '@rain2d/rain/math';
+import { Entity } from '@rain2d/scenes';
+import type { View } from '@rain2d/view';
 
 export class Bunny extends Entity {
   @inject()

@@ -1,10 +1,10 @@
-import { Vec2 } from '../math/vec2.js';
+import { Color } from '@rainengine/rain/graphics';
 import type { Ease } from './easing.js';
 import { Tween } from './tween.js';
 
-export class TweenVec2 {
-  start: Vec2;
-  end: Vec2;
+export class TweenColor {
+  start: Color;
+  end: Color;
 
   get finished(): boolean {
     return this.tween.finished;
@@ -28,22 +28,15 @@ export class TweenVec2 {
 
   private tween: Tween;
 
-  constructor(start: Vec2, end: Vec2, duration: number, ease?: Ease) {
+  constructor(start: Color, end: Color, duration: number, ease?: Ease) {
     this.start = start;
     this.end = end;
     this.tween = new Tween(0, 1, duration, ease);
   }
 
-  update(dt: number, out?: Vec2): Vec2 {
+  update(dt: number, out?: Color): Color {
     const position = this.tween.update(dt);
-    if (!out) {
-      out = Vec2.get();
-    }
-
-    out.x = this.start.x + (this.end.x - this.start.x) * position;
-    out.y = this.start.y + (this.end.y - this.start.y) * position;
-
-    return out;
+    return Color.interpolate(this.start, this.end, position, out);
   }
 
   reset(): void {

@@ -1,5 +1,5 @@
 {
-  "name": "@rainengine-projects/bunnies",
+  "name": "@rain2d-projects/bunnies",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,7 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@rainengine/rain": "workspace:*"
+    "@rain2d/rain": "workspace:*",
+    "@rain2d/scenes": "workspace:*",
+    "@rain2d/view": "workspace:*"
   },
   "devDependencies": {
     "typescript": "catalog:",

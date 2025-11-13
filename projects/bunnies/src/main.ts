@@ -1,14 +1,13 @@
-import { Rain } from '@rainengine/rain';
-import { isMobile } from '@rainengine/rain/utils';
+import { isMobile } from '@rain2d/rain/utils';
+import { createRainWithScenes } from '@rain2d/scenes';
 import { LoadState } from './scenes/loadScene';
 
-const rain: Rain = new Rain({
+createRainWithScenes({
   designWidth: 800,
   designHeight: 600,
-  title: 'Bunnies',
-  fillWindow: isMobile(),
+  startScene: LoadState,
+  fillWindow: true,
 });
-rain.start(LoadState);
 
 if (isMobile()) {
   document.getElementsByTagName('html')[0].style.backgroundColor = '#000';

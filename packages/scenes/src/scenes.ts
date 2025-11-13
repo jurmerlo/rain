@@ -1,4 +1,4 @@
-import type { Graphics } from '../graphics/graphics.js';
+import type { Graphics } from '@rain2d/rain/graphics';
 import type { Scene, SceneClass } from './scene.js';
 
 export class Scenes {

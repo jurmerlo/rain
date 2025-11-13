@@ -1,5 +1,5 @@
-import type { Graphics } from '../graphics/graphics.js';
-import { Camera } from '../view/camera.js';
+import type { Graphics } from '@rain2d/rain/graphics';
+import { Camera } from '@rain2d/view';
 import { Entity } from './entity.js';
 
 export type SceneClass = new () => Scene;

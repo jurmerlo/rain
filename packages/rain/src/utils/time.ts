@@ -1,29 +1,29 @@
 export class Time {
   timeScale = 1;
 
-  get dt(): number {
-    return this._dt;
+  get deltaTime(): number {
+    return this._deltaTime;
   }
 
-  get dtUnscaled(): number {
-    return this._dtUnscaled;
+  get deltaTimeUnscaled(): number {
+    return this._deltaTimeUnscaled;
   }
 
   get fps(): number {
     return this._fps;
   }
 
-  private _dt = 0;
+  private _deltaTime = 0;
 
-  private _dtUnscaled = 0;
+  private _deltaTimeUnscaled = 0;
 
   private _fps = 0;
 
   private frameTimes: number[] = [];
 
   update(dt: number): void {
-    this._dtUnscaled = dt;
-    this._dt = dt * this.timeScale;
+    this._deltaTimeUnscaled = dt;
+    this._deltaTime = dt * this.timeScale;
 
     this.frameTimes.push(dt);
     if (this.frameTimes.length > 240) {

@@ -14,6 +14,11 @@ export function glsl(source: TemplateStringsArray): string {
  */
 export class GLContext {
   /**
+   * The canvas element used for rendering.
+   */
+  readonly canvas: HTMLCanvasElement;
+
+  /**
    * Is the context a WebGL1 context. If WebGL2 is not available, WebGL1 features will be used.
    */
   readonly isGL1: boolean;
@@ -28,6 +33,7 @@ export class GLContext {
    * @param canvasId - The id of the canvas element to get the context from.
    */
   constructor(canvas: HTMLCanvasElement) {
+    this.canvas = canvas;
     let isGL1 = false;
 
     const attributes: WebGLContextAttributes = {

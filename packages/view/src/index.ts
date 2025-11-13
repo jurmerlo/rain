@@ -10,4 +10,4 @@ export {
   scaleModeNoScale,
   scaleModeStretch,
 } from './scaleModes.js';
-export { View, type ViewOptions } from './view.js';
+export { View } from './view.js';

@@ -2,7 +2,6 @@
 import { Mat4 } from '../math/mat4.js';
 import type { Rectangle } from '../math/rectangle.js';
 import type { Vec2 } from '../math/vec2.js';
-import type { View } from '../view/view.js';
 import type { BitmapFont } from './bitmapFont.js';
 import { Color } from './color.js';
 import type { GLContext } from './glContext.js';
@@ -25,6 +24,10 @@ export class Graphics {
     return this.transformStack[this.transformStack.length - 1];
   }
 
+  get target(): RenderTarget {
+    return this.targetStack[this.targetStack.length - 1];
+  }
+
   private shapeRenderer: ShapeRenderer;
 
   private imageRenderer: ImageRenderer;
@@ -37,11 +40,8 @@ export class Graphics {
 
   private glContext: GLContext;
 
-  private view: View;
-
-  constructor(glContext: GLContext, view: View) {
+  constructor(glContext: GLContext) {
     this.glContext = glContext;
-    this.view = view;
 
     this.projection = new Mat4();
     this.transformStack.push(new Mat4());
@@ -114,8 +114,8 @@ export class Graphics {
       width = target.width;
       height = target.height;
     } else {
-      width = this.view.canvasWidth;
-      height = this.view.canvasHeight;
+      width = this.glContext.canvas.width;
+      height = this.glContext.canvas.height;
     }
 
     this.projection.ortho(0, width, height, 0, -1, 1);
