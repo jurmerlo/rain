@@ -1,0 +1,79 @@
+name: Lint, Build and Test Rain
+on:
+  pull_request: 
+    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - main
+jobs:
+  lint-repo:
+    name: Lint Rain Repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.20.0
+      
+      - name: Use Node.js v22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Lint Respository
+        run: pnpm lint
+
+
+  build-test-rain:
+    name: Build and Test Rain
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.20.0
+      
+      - name: Use Node.js v22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm --filter @rainengine/rain install
+
+      - name: Build Rain
+        run: pnpm --filter @rainengine/rain build
+
+      - name: Test Rain
+        run: pnpm --filter @rainengine/rain test
+
+
+  build-projects:
+    name: Build Rain Projects
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.20.0
+      
+      - name: Use Node.js v22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Build @rainengine/rain
+        run: pnpm --filter @rainengine/rain build
+
+      # Bunnies Project
+      - name: Build @rainengine-projects/bunnies
+        run: pnpm --filter @rainengine-projects/bunnies build

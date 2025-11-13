@@ -1,6 +1,6 @@
 import { Rain } from '@rainengine/rain';
-import { LoadState } from './scenes/loadScene';
 import { isMobile } from '@rainengine/rain/utils';
+import { LoadState } from './scenes/loadScene';
 
 const rain: Rain = new Rain({
   designWidth: 800,

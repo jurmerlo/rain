@@ -1,4 +1,4 @@
-import { Graphics } from '../graphics/graphics.js';
+import type { Graphics } from '../graphics/graphics.js';
 import { Camera } from '../view/camera.js';
 import { Entity } from './entity.js';
 
