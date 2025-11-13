@@ -1,4 +1,4 @@
-import { inject } from '../di/index.js';
+import { inject } from '../di/inject.js';
 import { BitmapFont } from '../graphics/bitmapFont.js';
 import { Image } from '../graphics/image.js';
 import { AssetLoader, type AssetLoaderLoadParams } from './assetLoader.js';

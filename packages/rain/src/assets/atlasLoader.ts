@@ -1,4 +1,4 @@
-import { inject } from '../di/index.js';
+import { inject } from '../di/inject.js';
 import { Atlas } from '../graphics/atlas.js';
 import { Image } from '../graphics/image.js';
 import { AssetLoader, type AssetLoaderLoadParams } from './assetLoader.js';
