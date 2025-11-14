@@ -13,48 +13,139 @@ import { clamp } from './math/mathUtils.js';
 import { Random } from './math/random.js';
 import { Time } from './utils/time.js';
 
+/**
+ * Configuration options for initializing Rain.
+ */
 export type RainOptions = {
+  /**
+   * The width of the canvas in pixels.
+   */
   width?: number;
+
+  /**
+   * The height of the canvas in pixels.
+   */
   height?: number;
+
+  /**
+   * The title of the document/game.
+   */
   title?: string;
+
+  /**
+   * Whether to enable high DPI rendering.
+   */
   hdpi?: boolean;
+
+  /**
+   * Target frames per second (-1 for unlimited).
+   */
   targetFps?: number;
+
+  /**
+   * Whether the game should continue running when not in focus.
+   */
   runInBackground?: boolean;
 };
 
+/**
+ * Callback functions for Rain lifecycle events.
+ */
 type Callbacks = {
+  /**
+   * Called every frame with the delta time.
+   */
   update?: (deltaTime: number) => void;
+
+  /**
+   * Called every frame to render graphics.
+   */
   draw?: (graphics: Graphics) => void;
+
+  /**
+   * Called when the canvas gains focus.
+   */
   focus?: () => void;
+
+  /**
+   * Called when the canvas loses focus.
+   */
   blur?: () => void;
+
+  /**
+   * Called when the window is resized.
+   */
   resize?: (width: number, height: number) => void;
 };
 
+/**
+ * Maximum delta time allowed per frame (1/15th of a second).
+ */
 const MAX_DT: number = 1.0 / 15;
 
+/**
+ * The main Rain game engine class.
+ */
 export class Rain {
+  /**
+   * Callback functions for lifecycle events.
+   */
   readonly callbacks: Callbacks;
 
+  /**
+   * Target frames per second for the game loop.
+   */
   readonly targetFps: number;
 
+  /**
+   * Whether high DPI rendering is enabled.
+   */
   readonly hdpi: boolean;
 
+  /**
+   * The device pixel ratio used for rendering.
+   */
   readonly pixelRatio: number;
 
+  /**
+   * The input manager instance.
+   */
   private input: Input;
 
+  /**
+   * Whether the game should run when not in focus.
+   */
   private runInBackground: boolean;
 
+  /**
+   * Timestamp of the last frame in milliseconds.
+   */
   private lastFrameTime: number;
 
+  /**
+   * The graphics rendering instance.
+   */
   private graphics: Graphics;
 
+  /**
+   * Whether the game loop has been started.
+   */
   private started: boolean;
 
+  /**
+   * Whether the canvas currently has focus.
+   */
   private inFocus: boolean;
 
+  /**
+   * The time manager instance.
+   */
   private time: Time;
 
+  /**
+   * Create a new Rain instance.
+   * @param options - Configuration options for Rain.
+   */
   constructor({
     width = 800,
     height = 600,
@@ -121,6 +212,10 @@ export class Rain {
     this.lastFrameTime = 0;
   }
 
+  /**
+   * Start the game loop.
+   * @throws Error if Rain is already started.
+   */
   start(): void {
     if (this.started) {
       throw new Error('Rain is already started');
@@ -135,6 +230,9 @@ export class Rain {
     });
   }
 
+  /**
+   * Handle canvas focus event.
+   */
   focus(): void {
     if (!this.started) {
       return;
@@ -146,6 +244,9 @@ export class Rain {
     }
   }
 
+  /**
+   * Handle canvas blur event.
+   */
   blur(): void {
     if (!this.started) {
       return;
@@ -156,6 +257,11 @@ export class Rain {
     }
   }
 
+  /**
+   * Handle window resize event.
+   * @param width - The new window width.
+   * @param height - The new window height.
+   */
   resize(width: number, height: number): void {
     if (!this.started) {
       return;
@@ -166,6 +272,9 @@ export class Rain {
     }
   }
 
+  /**
+   * Main game loop that runs every frame.
+   */
   private loop(): void {
     window.requestAnimationFrame(() => this.loop());
 
@@ -175,17 +284,21 @@ export class Rain {
       this.update(timePassed / 1000.0);
       this.lastFrameTime = now;
     } else {
-      const interval = 1.0 / this.targetFps;
+      const interval = 1000.0 / this.targetFps;
       if (timePassed < interval) {
         return;
       }
 
       const excess = timePassed % interval;
-      this.update(excess / 1000.0);
+      this.update(interval / 1000.0);
       this.lastFrameTime = now - excess;
     }
   }
 
+  /**
+   * Update game state and trigger draw.
+   * @param deltaTime - The time elapsed since the last frame in seconds.
+   */
   private update(deltaTime: number): void {
     if (!this.inFocus && !this.runInBackground) {
       return;
@@ -201,6 +314,9 @@ export class Rain {
     this.draw();
   }
 
+  /**
+   * Render the current frame.
+   */
   private draw(): void {
     if (this.callbacks.draw) {
       this.callbacks.draw(this.graphics);

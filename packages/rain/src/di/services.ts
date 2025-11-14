@@ -28,7 +28,7 @@ export function addService(name: string, service: unknown): void {
 }
 
 /**
- * Records a service from the container.
+ * Removes a service from the container.
  * @param name - The name of the service to remove.
  */
 export function removeService(name: string): void {

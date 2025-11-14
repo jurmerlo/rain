@@ -69,7 +69,7 @@ export class Image {
    * Update the image data at the specified position.
    * @param x - The x position in pixels.
    * @param y - The y position in pixels.
-   * @param color The color to set the pixel to.
+   * @param color - The color to set the pixel to.
    */
   setPixel(x: number, y: number, color: Color): void {
     const index = (y * this.width + x) * 4;

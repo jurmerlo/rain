@@ -49,16 +49,23 @@ export class ShapeRenderer extends BaseRenderer {
     this.tempVec3 = new Vec3();
 
     this.vertexBuffer = glContext.gl.createBuffer();
+    if (!this.vertexBuffer) {
+      throw new Error('Failed to create vertex buffer');
+    }
     this.vertexIndices = new Float32Array(this.BUFFER_SIZE * TRIANGLE_OFFSET);
 
     this.indexBuffer = glContext.gl.createBuffer();
+    if (!this.indexBuffer) {
+      throw new Error('Failed to create index buffer');
+    }
     this.indexIndices = new Int32Array(this.BUFFER_SIZE * VERTICES_PER_TRI);
 
-    // The indices are the same for all triangles.
-    for (let i = 0; i < this.indexIndices.length; i++) {
-      this.indexIndices[i * VERTICES_PER_TRI] = i * VERTICES_PER_TRI;
-      this.indexIndices[i * VERTICES_PER_TRI + 1] = i * VERTICES_PER_TRI + 1;
-      this.indexIndices[i * VERTICES_PER_TRI + 2] = i * VERTICES_PER_TRI + 2;
+    // Initialize index buffer data - fix the loop to iterate over triangles, not indices
+    for (let i = 0; i < this.BUFFER_SIZE; i++) {
+      const baseIndex = i * VERTICES_PER_TRI;
+      this.indexIndices[baseIndex] = baseIndex;
+      this.indexIndices[baseIndex + 1] = baseIndex + 1;
+      this.indexIndices[baseIndex + 2] = baseIndex + 2;
     }
 
     this.createDefaultShader();
@@ -78,6 +85,9 @@ export class ShapeRenderer extends BaseRenderer {
     }
   }
 
+  /**
+   * Start a new batch.
+   */
   start(): void {
     this.index = 0;
   }
@@ -284,8 +294,8 @@ export class ShapeRenderer extends BaseRenderer {
 
   /**
    * Draw a filled polygon.
-   * @param centerX - The x-coordinate of the center of the circle.
-   * @param centerY - The y-coordinate of the center of the circle.
+   * @param centerX - The x-coordinate of the center of the polygon.
+   * @param centerY - The y-coordinate of the center of the polygon.
    * @param vertices - The vertices of the polygon.
    */
   drawFilledPolygon(centerX: number, centerY: number, vertices: Vec2[]): void {
@@ -313,8 +323,8 @@ export class ShapeRenderer extends BaseRenderer {
 
   /**
    * Draw a polygon.
-   * @param centerX - The x-coordinate of the center of the circle.
-   * @param centerY - The y-coordinate of the center of the circle.
+   * @param centerX - The x-coordinate of the center of the polygon.
+   * @param centerY - The y-coordinate of the center of the polygon.
    * @param vertices - The vertices of the polygon.
    * @param lineWidth - The width of the line.
    */

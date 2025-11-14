@@ -12,36 +12,84 @@ import type { RenderTarget } from './renderTarget.js';
 import type { Shader } from './shader.js';
 import type { LineAlign } from './types.js';
 
+/**
+ * Maximum size of the render target stack.
+ */
 const MAX_TARGET_STACK = 64;
+
+/**
+ * Maximum size of the transform stack.
+ */
 const MAX_TRANSFORM_STACK = 128;
 
+/**
+ * The main graphics class used to draw shapes and images.
+ */
 export class Graphics {
-  color = new Color(1, 1, 1, 1);
+  /**
+   * The current color tint.
+   */
+  color: Color;
 
-  transformStack: Mat4[] = [];
+  /**
+   * The transform stack.
+   */
+  transformStack: Mat4[];
 
+  /**
+   * The current transform matrix.
+   */
   get transform(): Mat4 {
     return this.transformStack[this.transformStack.length - 1];
   }
 
+  /**
+   * The current render target.
+   */
   get target(): RenderTarget {
     return this.targetStack[this.targetStack.length - 1];
   }
 
+  /**
+   * The shape renderer.
+   */
   private shapeRenderer: ShapeRenderer;
 
+  /**
+   * The image renderer.
+   */
   private imageRenderer: ImageRenderer;
 
-  private targetStack: RenderTarget[] = [];
+  /**
+   * The render target stack.
+   */
+  private targetStack: RenderTarget[];
 
-  private clearColor = new Color(0, 0, 0, 1);
+  /**
+   * The clear color used when clearing the screen or targets.
+   */
+  private clearColor: Color;
 
+  /**
+   * The view projection matrix.
+   */
   private projection: Mat4;
 
+  /**
+   * The WebGL context used for rendering.
+   */
   private glContext: GLContext;
 
+  /**
+   * Create a new graphics instance.
+   * @param glContext - The WebGL context.
+   */
   constructor(glContext: GLContext) {
     this.glContext = glContext;
+    this.color = new Color(1, 1, 1, 1);
+    this.transformStack = [];
+    this.targetStack = [];
+    this.clearColor = new Color(0, 0, 0, 1);
 
     this.projection = new Mat4();
     this.transformStack.push(new Mat4());
@@ -50,6 +98,10 @@ export class Graphics {
     this.imageRenderer = new ImageRenderer(glContext);
   }
 
+  /**
+   * Push a new render target onto the stack.
+   * @param target - The new render target.
+   */
   pushTarget(target: RenderTarget): void {
     if (this.targetStack.length === MAX_TARGET_STACK) {
       throw new Error('Render target stack size exceeded. (more pushes than pulls?)');
@@ -59,6 +111,9 @@ export class Graphics {
     this.glContext.gl.bindFramebuffer(this.glContext.gl.FRAMEBUFFER, target.buffer);
   }
 
+  /**
+   * Pop the current render target off the stack.
+   */
   popTarget(): void {
     this.targetStack.pop();
     const gl = this.glContext.gl;
@@ -70,6 +125,9 @@ export class Graphics {
     }
   }
 
+  /**
+   * Clear all render targets from the stack.
+   */
   clearTargets(): void {
     while (this.targetStack.length > 0) {
       this.targetStack.pop();
@@ -77,6 +135,10 @@ export class Graphics {
     this.glContext.gl.bindFramebuffer(this.glContext.gl.FRAMEBUFFER, null);
   }
 
+  /**
+   * Push a new transform onto the stack.
+   * @param transform - Optional transform to push. If not provided, the current transform will be pushed.
+   */
   pushTransform(transform?: Mat4): void {
     if (this.transformStack.length === MAX_TRANSFORM_STACK) {
       throw new Error('Transform stack size exceeded. (more pushes than pulls?)');
@@ -89,10 +151,17 @@ export class Graphics {
     }
   }
 
+  /**
+   * Multiply the current transform by the given transform.
+   * @param transform - The transform to apply.
+   */
   applyTransform(transform: Mat4): void {
     Mat4.multiply(this.transform, transform, this.transform);
   }
 
+  /**
+   * Pop the current transform off the stack.
+   */
   popTransform(): void {
     if (this.transformStack.length <= 1) {
       throw new Error('Cannot pop the last transform off the stack');
@@ -104,6 +173,11 @@ export class Graphics {
     }
   }
 
+  /**
+   * Start a new rendering batch.
+   * @param clear Should the screen or target be cleared.
+   * @param newClearColor The color to use when clearing. If not provided, the default clear color will be used.
+   */
   start(clear: boolean = true, newClearColor?: Color): void {
     const gl = this.glContext.gl;
     let width = 0;
@@ -343,42 +417,104 @@ export class Graphics {
     this.imageRenderer.drawBitmapText(x, y, font, text);
   }
 
+  /**
+   * Set a boolean uniform variable.
+   * @param location - The location of the uniform variable.
+   * @param value - The boolean value to set.
+   */
   setBool(location: WebGLUniformLocation | null, value: boolean): void {
     this.glContext.gl.uniform1i(location, value ? 1 : 0);
   }
 
+  /**
+   * Set an integer uniform variable.
+   * @param location - The location of the uniform variable.
+   * @param value - The integer value to set.
+   */
   setInt(location: WebGLUniformLocation | null, value: number): void {
     this.glContext.gl.uniform1i(location, value);
   }
 
+  /**
+   * Set a vec2 integer uniform variable.
+   * @param location - The location of the uniform variable.
+   * @param value1 - The first integer value.
+   * @param value2 - The second integer value.
+   */
   setInt2(location: WebGLUniformLocation | null, value1: number, value2: number): void {
     this.glContext.gl.uniform2i(location, value1, value2);
   }
 
+  /**
+   * Set a vec3 integer uniform variable.
+   * @param location - The location of the uniform variable.
+   * @param value1 - The first integer value.
+   * @param value2 - The second integer value.
+   * @param value3 - The third integer value.
+   */
   setInt3(location: WebGLUniformLocation | null, value1: number, value2: number, value3: number): void {
     this.glContext.gl.uniform3i(location, value1, value2, value3);
   }
 
+  /**
+   * Set a vec4 integer uniform variable.
+   * @param location - The location of the uniform variable.
+   * @param value1 - The first integer value.
+   * @param value2 - The second integer value.
+   * @param value3 - The third integer value.
+   * @param value4 - The fourth integer value.
+   */
   setInt4(location: WebGLUniformLocation | null, value1: number, value2: number, value3: number, value4: number): void {
     this.glContext.gl.uniform4i(location, value1, value2, value3, value4);
   }
 
+  /**
+   * Set an array of integer uniform variables.
+   * @param location - The location of the uniform variable.
+   * @param value - The array of integer values to set.
+   */
   setInts(location: WebGLUniformLocation | null, value: Int32Array): void {
     this.glContext.gl.uniform1iv(location, value);
   }
 
+  /**
+   * Set a float uniform variable.
+   * @param location - The location of the uniform variable.
+   * @param value - The float value to set.
+   */
   setFloat(location: WebGLUniformLocation | null, value: number): void {
     this.glContext.gl.uniform1f(location, value);
   }
 
+  /**
+   * Set a vec2 float uniform variable.
+   * @param location - The location of the uniform variable.
+   * @param value1 - The first float value.
+   * @param value2 - The second float value.
+   */
   setFloat2(location: WebGLUniformLocation | null, value1: number, value2: number): void {
     this.glContext.gl.uniform2f(location, value1, value2);
   }
 
+  /**
+   * Set a vec3 float uniform variable.
+   * @param location - The location of the uniform variable.
+   * @param value1 - The first float value.
+   * @param value2 - The second float value.
+   * @param value3 - The third float value.
+   */
   setFloat3(location: WebGLUniformLocation | null, value1: number, value2: number, value3: number): void {
     this.glContext.gl.uniform3f(location, value1, value2, value3);
   }
 
+  /**
+   * Set a vec4 float uniform variable.
+   * @param location - The location of the uniform variable.
+   * @param value1 - The first float value.
+   * @param value2 - The second float value.
+   * @param value3 - The third float value.
+   * @param value4 - The fourth float value.
+   */
   setFloat4(
     location: WebGLUniformLocation | null,
     value1: number,
@@ -389,14 +525,29 @@ export class Graphics {
     this.glContext.gl.uniform4f(location, value1, value2, value3, value4);
   }
 
+  /**
+   * Set an array of float uniform variables.
+   * @param location - The location of the uniform variable.
+   * @param value - The array of float values to set.
+   */
   setFloats(location: WebGLUniformLocation | null, value: Float32Array): void {
     this.glContext.gl.uniform1fv(location, value);
   }
 
+  /**
+   * Set a 4x4 matrix uniform variable.
+   * @param location - The location of the uniform variable.
+   * @param value - The 4x4 matrix to set.
+   */
   setMatrix(location: WebGLUniformLocation | null, value: Mat4): void {
     this.glContext.gl.uniformMatrix4fv(location, false, value.value);
   }
 
+  /**
+   * Set a texture uniform variable.
+   * @param unit - The texture unit to set.
+   * @param value - The image to set as the texture.
+   */
   setTexture(unit: number, value?: Image): void {
     const gl = this.glContext.gl;
     gl.activeTexture(gl.TEXTURE0 + unit);

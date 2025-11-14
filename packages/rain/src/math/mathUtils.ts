@@ -74,6 +74,7 @@ export function fuzzyEqual(a: number, b: number, epsilon: number = 0.0001): bool
  * @param point - The point to rotate.
  * @param center - The center to rotate around.
  * @param rotation - The rotation angle in degrees.
+ * @param out - Optional vector to store the result.
  * @returns The rotated position.
  */
 export function rotateAround(point: Vec2, center: Vec2, rotation: number, out?: Vec2): Vec2 {
@@ -100,8 +101,6 @@ export function rotateAround(point: Vec2, center: Vec2, rotation: number, out?: 
  * @param out - Optional variable to store the intersect position in.
  * @returns True if the lines intersect.
  */
-
-// biome-ignore lint/nursery/useMaxParams: This will be called a lot times and will result in a lot of created objects.
 export function linesIntersect(p1Start: Vec2, p1End: Vec2, p2Start: Vec2, p2End: Vec2, out?: Vec2): boolean {
   const b = p1End.clone().subtract(p1Start);
   const d = p2End.clone().subtract(p2Start);
@@ -142,11 +141,11 @@ export function linesIntersect(p1Start: Vec2, p1End: Vec2, p2Start: Vec2, p2End:
     if (out.isZero) {
       out.copyFrom(point);
     } else {
-      if (Vec2.distance(p1Start, point) < Vec2.distance(p1Start, out)) {
+      if (Vec2.distanceSquared(point, p1Start) < Vec2.distanceSquared(out, p1Start)) {
         out.copyFrom(point);
       }
-      Vec2.put(p1Start);
     }
+
     Vec2.put(point);
   }
 

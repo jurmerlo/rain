@@ -204,7 +204,7 @@ export class Mat4 {
     result.value[1] = wz * scaleX;
     result.value[2] = 0;
     result.value[3] = 0;
-    result.value[4] = (0 - wz) * scaleY;
+    result.value[4] = -wz * scaleY;
     result.value[5] = (1 - zz) * scaleY;
     result.value[6] = 0;
     result.value[7] = 0;
@@ -415,30 +415,54 @@ export class Mat4 {
     this.value[15] = mat.value[15];
   }
 
+  /**
+   * Translate the matrix by x and y.
+   * @param x - The x translation.
+   * @param y - The y translation.
+   */
   translate(x: number, y: number): void {
     this.value[12] += x;
     this.value[13] += y;
   }
 
+  /**
+   * Scale the matrix by x and y.
+   * @param x - The x scale factor.
+   * @param y - The y scale factor.
+   */
   scale(x: number, y: number): void {
     this.value[0] *= x;
-    this.value[1] *= y;
-    this.value[4] *= x;
+    this.value[1] *= x;
+    this.value[4] *= y;
     this.value[5] *= y;
     this.value[8] *= x;
     this.value[9] *= y;
   }
 
+  /**
+   * Rotate the matrix by an angle around the Z-axis.
+   * @param angle - The rotation angle in radians.
+   */
   rotate(angle: number): void {
     const c = Math.cos(angle);
     const s = Math.sin(angle);
 
-    this.value[0] = c;
-    this.value[1] = s;
-    this.value[4] = -s;
-    this.value[5] = c;
+    const a00 = this.value[0];
+    const a01 = this.value[1];
+    const a10 = this.value[4];
+    const a11 = this.value[5];
+
+    this.value[0] = a00 * c + a10 * s;
+    this.value[1] = a01 * c + a11 * s;
+    this.value[4] = a00 * -s + a10 * c;
+    this.value[5] = a01 * -s + a11 * c;
   }
 
+  /**
+   * Get the 2D translation from the matrix.
+   * @param out - Optional vector to store the result.
+   * @returns The translation vector.
+   */
   get2dTranslation(out?: Vec2): Vec2 {
     const result = out ?? Vec2.get();
     result.x = this.value[12];
@@ -447,6 +471,11 @@ export class Mat4 {
     return result;
   }
 
+  /**
+   * Get the 2D scale from the matrix.
+   * @param out - Optional vector to store the result.
+   * @returns The scale vector.
+   */
   get2dScale(out?: Vec2): Vec2 {
     const result = out ?? Vec2.get();
     result.x = Math.sqrt(this.value[0] * this.value[0] + this.value[1] * this.value[1]);
@@ -455,6 +484,10 @@ export class Mat4 {
     return result;
   }
 
+  /**
+   * Get the Z-axis rotation from the matrix.
+   * @returns The rotation angle in radians.
+   */
   getZRotation(): number {
     return Math.atan2(this.value[1], this.value[0]);
   }
@@ -468,7 +501,6 @@ export class Mat4 {
    * @param near - The near clipping plane.
    * @param far - The far clipping plane.
    */
-
   // biome-ignore lint/nursery/useMaxParams: This function can be called a lot of times, so keeping params in a single object would be less efficient.
   ortho(left: number, right: number, bottom: number, top: number, near: number, far: number): void {
     const lr = 1 / (left - right);
@@ -495,8 +527,8 @@ export class Mat4 {
 
   /**
    * Invert a matrix and return the inverted matrix.
-   * @param out - Optional matrix to store the result.
-   * @returns The inverted matrix.
+   * @param out - Matrix to store the result.
+   * @returns The inverted matrix, or null if the matrix is not invertible.
    */
   invert(out: Mat4): Mat4 | null {
     const a00 = this.value[0];
@@ -563,9 +595,6 @@ export class Mat4 {
    * @returns A string representation of the matrix.
    */
   toString(): string {
-    return `Matrix4x4( ${this.value[0]}, ${this.value[1]}, ${this.value[2]}, ${this.value[3]}, ${this.value[4]}' +
-      ', ${this.value[5]}, ${this.value[6]}, ${this.value[7]}, ${this.value[8]}, ${this.value[9]}' +
-      ', ${this.value[10]}, ${this.value[11]}, ${this.value[12]}, ${this.value[13]}, ${this.value[14]}' +
-      ', ${this.value[15]} )`;
+    return `Matrix4x4( ${this.value[0]}, ${this.value[1]}, ${this.value[2]}, ${this.value[3]}, ${this.value[4]}, ${this.value[5]}, ${this.value[6]}, ${this.value[7]}, ${this.value[8]}, ${this.value[9]}, ${this.value[10]}, ${this.value[11]}, ${this.value[12]}, ${this.value[13]}, ${this.value[14]}, ${this.value[15]} )`;
   }
 }

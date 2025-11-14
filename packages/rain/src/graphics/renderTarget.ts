@@ -3,7 +3,7 @@ import { Mat4 } from '../math/mat4.js';
 import type { GLContext } from './glContext.js';
 
 /**
- * A render target is an object that can be rendered to. And then be used as a texture.
+ * A render target is an object that can be rendered to and then used as a texture.
  */
 export class RenderTarget {
   /**
@@ -24,12 +24,12 @@ export class RenderTarget {
   /**
    * The texture that can be used to render to.
    */
-  texture: WebGLTexture | null;
+  readonly texture: WebGLTexture;
 
   /**
    * The framebuffer that can be used to render to.
    */
-  buffer: WebGLFramebuffer | null;
+  readonly buffer: WebGLFramebuffer;
 
   /**
    * The WebGL rendering context.
@@ -64,6 +64,7 @@ export class RenderTarget {
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.buffer);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, tex2d, this.texture, 0);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.bindTexture(tex2d, null);
   }
 
   /**
@@ -72,9 +73,7 @@ export class RenderTarget {
   destroy(): void {
     const gl = this.glContext.gl;
     gl.deleteTexture(this.texture);
-    this.texture = null;
 
     gl.deleteFramebuffer(this.buffer);
-    this.buffer = null;
   }
 }

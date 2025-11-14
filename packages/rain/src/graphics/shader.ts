@@ -47,8 +47,14 @@ export class Shader {
    */
   textureParameters: TextureParameters;
 
+  /**
+   * The shape vertex shader. Cached after first creation.
+   */
   private static shapeVertShader: WebGLShader;
 
+  /**
+   * The image vertex shader. Cached after first creation.
+   */
   private static imageVertShader: WebGLShader;
 
   /**
@@ -83,17 +89,18 @@ export class Shader {
     const fragmentShader = this.createShader(gl.FRAGMENT_SHADER, source);
 
     this.program = this.createProgram(gl, vertexShader, fragmentShader);
+    gl.deleteShader(fragmentShader);
 
     const projection = this.getUniformLocation('u_projection');
     if (!projection) {
-      throw new Error('projection not available in the vertex shader');
+      throw new Error('u_projection not available in the vertex shader');
     }
 
     this.uniforms.u_projection = projection;
     if (type === 'image') {
       const texture = this.getUniformLocation('u_texture');
       if (!texture) {
-        throw new Error('tex not available in the fragment shader');
+        throw new Error('u_texture not available in the fragment shader');
       }
       this.uniforms.u_texture = texture;
     }
@@ -188,6 +195,10 @@ export class Shader {
     this.glContext.gl.deleteProgram(this.program);
   }
 
+  /**
+   * Get the shape vertex shader. Cached after first creation.
+   * @returns The shape vertex shader.
+   */
   private getShapeVertShader(): WebGLShader {
     if (!Shader.shapeVertShader) {
       Shader.shapeVertShader = this.createShader(
@@ -199,6 +210,10 @@ export class Shader {
     return Shader.shapeVertShader;
   }
 
+  /**
+   * Get the image vertex shader. Cached after first creation.
+   * @returns The image vertex shader.
+   */
   private getImageVertShader(): WebGLShader {
     if (!Shader.imageVertShader) {
       Shader.imageVertShader = this.createShader(
@@ -245,19 +260,19 @@ export class Shader {
     if (program) {
       gl.attachShader(program, vertexShader);
       gl.attachShader(program, fragmentShader);
-      gl.linkProgram(program);
-
-      const success = gl.getProgramParameter(program, gl.LINK_STATUS) as boolean;
-      if (!success) {
-        const error = gl.getProgramInfoLog(program);
-        throw new Error(`Error while linking shader program: ${error}`);
-      }
 
       gl.bindAttribLocation(program, this.positionLocation, 'a_position');
       gl.bindAttribLocation(program, this.colorLocation, 'a_color');
 
       if (this.type === 'image') {
         gl.bindAttribLocation(program, this.uvLocation, 'a_uv');
+      }
+
+      gl.linkProgram(program);
+      const success = gl.getProgramParameter(program, gl.LINK_STATUS) as boolean;
+      if (!success) {
+        const error = gl.getProgramInfoLog(program);
+        throw new Error(`Error while linking shader program: ${error}`);
       }
 
       return program;

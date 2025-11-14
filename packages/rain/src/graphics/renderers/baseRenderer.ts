@@ -7,8 +7,14 @@ import type { Shader } from '../shader.js';
  * The base renderer class that all renderers should extend.
  */
 export class BaseRenderer {
+  /**
+   * The current color tint.
+   */
   color: Color;
 
+  /**
+   * The current transform matrix.
+   */
   transform: Mat4;
 
   /**

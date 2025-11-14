@@ -42,6 +42,10 @@ export class Rectangle {
     this.height = height;
   }
 
+  /**
+   * Copy values from another rectangle into this rectangle.
+   * @param rect - The rectangle to copy from.
+   */
   copyFrom(rect: Rectangle): void {
     this.x = rect.x;
     this.y = rect.y;
@@ -49,6 +53,11 @@ export class Rectangle {
     this.height = rect.height;
   }
 
+  /**
+   * Clone this rectangle.
+   * @param out - Optional rectangle to store the result.
+   * @returns The cloned rectangle.
+   */
   clone(out?: Rectangle): Rectangle {
     if (out) {
       out.set(this.x, this.y, this.width, this.height);
@@ -100,7 +109,7 @@ export class Rectangle {
       intersects = true;
     }
 
-    // Check right
+    // Check right.
     tempStart.set(this.x + this.width, this.y + this.height);
     tempEnd.set(this.x + this.width, this.y);
     if (linesIntersect(origin, target, tempStart, tempEnd, out)) {
@@ -109,7 +118,7 @@ export class Rectangle {
 
     // Check bottom.
     tempStart.set(this.x, this.y + this.height);
-    tempEnd.set(this.x, this.y + this.height);
+    tempEnd.set(this.x + this.width, this.y + this.height);
     if (linesIntersect(origin, target, tempStart, tempEnd, out)) {
       intersects = true;
     }

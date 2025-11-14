@@ -69,6 +69,7 @@ export class AudioChannel {
   /**
    * Create a new Audio Channel instance.
    * @param gain - The gain node.
+   * @throws Error if gain node is invalid.
    */
   constructor(gain: GainNode) {
     this._gain = gain;
@@ -76,21 +77,28 @@ export class AudioChannel {
     this.startTime = 0;
     this.pauseTime = 0;
     this.loop = 0;
-    this.ended = false;
+    this.ended = true; // Start in ended state
     this.paused = false;
   }
 
   /**
    * Pause this channel.
    * @param time - The current sound time.
+   * @throws Error if time is invalid.
    */
   pause(time: number): void {
-    if (this.source) {
+    if (this.source && !this.paused && !this.ended) {
       this.pauseTime = time - this.startTime;
       this.paused = true;
-      this.source.disconnect();
-      this._gain.disconnect();
-      this.source.stop();
+
+      try {
+        this.source.disconnect();
+        this._gain.disconnect();
+        this.source.stop();
+      } catch (error) {
+        console.warn('Error stopping audio source during pause:', error);
+      }
+
       this.source = undefined;
     }
   }
@@ -100,12 +108,22 @@ export class AudioChannel {
    */
   stop(): void {
     if (this.source) {
-      this.source.disconnect();
-      this._gain.disconnect();
-      this.source.stop();
+      try {
+        this.source.disconnect();
+        this._gain.disconnect();
+        this.source.stop();
+      } catch (error) {
+        console.warn('Error stopping audio source:', error);
+      }
+
       this.source = undefined;
-      this.ended = true;
-      this.paused = true;
     }
+
+    this.ended = true;
+    this.paused = false;
+    this.sound = undefined;
+    this.startTime = 0;
+    this.pauseTime = 0;
+    this.loop = 0;
   }
 }

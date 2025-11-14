@@ -1,18 +1,34 @@
+// biome-ignore-all lint/suspicious/noExplicitAny: Callback arguments can be anything.
+
+/**
+ * Type representing an event handler.
+ */
 export type EmitHandler = {
-  // biome-ignore lint/suspicious/noExplicitAny: Callback arguments can be anything.
+  /**
+   * The callback function to execute when the event is emitted.
+   * @param args The arguments passed to the callback.
+   */
   callback: (...args: any[]) => void;
-  // biome-ignore lint/suspicious/noExplicitAny: Filter function can be anything.
+  /**
+   * The optional filter function to determine if the callback should be executed.
+   * @param args The arguments passed to the filter function.
+   * @returns A boolean indicating whether the callback should be executed.
+   */
   filter?: (...args: any[]) => boolean;
 
+  /**
+   * Whether the handler is active.
+   */
   active: boolean;
 };
 
 /**
  * Class representing an event emitter.
  */
-
-// biome-ignore lint/suspicious/noExplicitAny: Generic type T can be any object with string keys and array values.
 export class Emitter<T extends Record<string, any[]>> {
+  /**
+   * The registered event handlers.
+   */
   private handlers: { [K in keyof T]?: EmitHandler[] } = {};
 
   /**

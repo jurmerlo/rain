@@ -70,18 +70,30 @@ export class ImageRenderer extends BaseRenderer {
     this.tempFrame = new Rectangle();
 
     this.vertexBuffer = this.glContext.gl.createBuffer();
+    if (!this.vertexBuffer) {
+      throw new Error('Failed to create vertex buffer');
+    }
     this.vertexIndices = new Float32Array(this.BUFFER_SIZE * QUAD_OFFSET);
 
     this.indexBuffer = this.glContext.gl.createBuffer();
+    if (!this.indexBuffer) {
+      throw new Error('Failed to create index buffer');
+    }
     this.indexIndices = new Int32Array(this.BUFFER_SIZE * INDICES_PER_QUAD);
 
-    for (let i = 0; i < this.indexIndices.length; i++) {
-      this.indexIndices[i * INDICES_PER_QUAD] = i * VERTICES_PER_QUAD;
-      this.indexIndices[i * INDICES_PER_QUAD + 1] = i * VERTICES_PER_QUAD + 1;
-      this.indexIndices[i * INDICES_PER_QUAD + 2] = i * VERTICES_PER_QUAD + 2;
-      this.indexIndices[i * INDICES_PER_QUAD + 3] = i * VERTICES_PER_QUAD;
-      this.indexIndices[i * INDICES_PER_QUAD + 4] = i * VERTICES_PER_QUAD + 2;
-      this.indexIndices[i * INDICES_PER_QUAD + 5] = i * VERTICES_PER_QUAD + 3;
+    for (let i = 0; i < this.BUFFER_SIZE; i++) {
+      const baseIndex = i * INDICES_PER_QUAD;
+      const baseVertex = i * VERTICES_PER_QUAD;
+
+      // First triangle (0, 1, 2)
+      this.indexIndices[baseIndex] = baseVertex;
+      this.indexIndices[baseIndex + 1] = baseVertex + 1;
+      this.indexIndices[baseIndex + 2] = baseVertex + 2;
+
+      // Second triangle (0, 2, 3)
+      this.indexIndices[baseIndex + 3] = baseVertex;
+      this.indexIndices[baseIndex + 4] = baseVertex + 2;
+      this.indexIndices[baseIndex + 5] = baseVertex + 3;
     }
 
     this.createDefaultShader();
@@ -101,6 +113,9 @@ export class ImageRenderer extends BaseRenderer {
     }
   }
 
+  /**
+   * Start a new batch.
+   */
   start(): void {
     this.index = 0;
     this.currentImage = undefined;

@@ -30,7 +30,12 @@
       },
       "nursery": {
         "useExplicitType": "error",
-        "useMaxParams": "error"
+        "useMaxParams": {
+          "level": "warn",
+          "options": {
+            "max": 5
+          }
+        }
       },
       "suspicious": {
         "useAwait": "error"

@@ -108,7 +108,7 @@ export class Vec3 {
   }
 
   /**
-   * Transform this vector by a 4x4 matrix.
+   * Transform this vector by a 4x4 matrix and optional x, y, z values.
    * @param mat - The matrix to transform by.
    * @param x - Optional x axis position.
    * @param y - Optional y axis position.

@@ -57,12 +57,22 @@ export class Vec2 {
   }
 
   /**
+   * Get the squared magnitude of the vector (faster than magnitude as it avoids sqrt).
+   */
+  get magnitudeSquared(): number {
+    return this.x * this.x + this.y * this.y;
+  }
+
+  /**
    * Set the new magnitude of the vector.
    */
   set magnitude(value: number) {
-    this.normalize();
-    this.x *= value;
-    this.y *= value;
+    const currentMagnitude = this.magnitude;
+    if (currentMagnitude !== 0) {
+      const scale = value / currentMagnitude;
+      this.x *= scale;
+      this.y *= scale;
+    }
   }
 
   /**
@@ -108,9 +118,22 @@ export class Vec2 {
   }
 
   /**
+   * Calculate the squared distance between two vectors (faster than distance as it avoids sqrt).
+   * @param a - The first vector.
+   * @param b - The second vector.
+   * @returns The squared distance.
+   */
+  static distanceSquared(a: Vec2, b: Vec2): number {
+    const x = a.x - b.x;
+    const y = a.y - b.y;
+
+    return x * x + y * y;
+  }
+
+  /**
    * Create a new vector.
-   * @param x The x axis position of the vector.
-   * @param y The y axis position of the vector.
+   * @param x - The x axis position of the vector.
+   * @param y - The y axis position of the vector.
    */
   constructor(x: number = 0, y: number = 0) {
     this.x = x;
@@ -209,6 +232,9 @@ export class Vec2 {
    * @returns The vector.
    */
   divide(other: Vec2): Vec2 {
+    if (other.x === 0 || other.y === 0) {
+      throw new Error('Cannot divide by zero vector component');
+    }
     this.x /= other.x;
     this.y /= other.y;
 
@@ -218,10 +244,13 @@ export class Vec2 {
   /**
    * Scale this vector by a scalar value.
    * @param scalar - The value to scale by.
+   * @returns The vector.
    */
-  scale(scalar: number): void {
+  scale(scalar: number): Vec2 {
     this.x *= scalar;
     this.y *= scalar;
+
+    return this;
   }
 
   /**

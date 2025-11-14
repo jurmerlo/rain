@@ -31,7 +31,7 @@ export class Random {
   /**
    * The start seed.
    */
-  private _seed = 1;
+  private _seed = 1.0;
 
   /**
    * Create a new random number generator.

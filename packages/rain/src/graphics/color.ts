@@ -48,7 +48,7 @@ export class Color {
    * Create a color from a hex string.
    * @param hex - The hex string.
    * @param out - Optional output color.
-   * @returns The new color
+   * @returns The new color.
    */
   static fromHex(hex: `#${string}`): Color {
     const matches = HEX_COLOR_REGEX.exec(hex);
