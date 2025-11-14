@@ -1,6 +1,10 @@
 packages:
   - packages/*
   - projects/*
+  - testing/rain/*
+  - testing/scenes/*
+  - testing/tweening/*
+  - testing/view/*
 
 catalog:
   typescript: ^5.9.3

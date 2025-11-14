@@ -115,7 +115,10 @@ export class View {
   constructor(designWidth: number, designHeight: number, fillWindow: boolean, pixelRatio: number) {
     this.designSize.set(designWidth, designHeight);
     this.canvas = this.glContext.canvas;
-    this.originalCanvasSize = new Vec2(this.canvas.width, this.canvas.height);
+    this.originalCanvasSize = new Vec2(
+      +this.canvas.style.width.replace('px', ''),
+      +this.canvas.style.height.replace('px', ''),
+    );
     this.pixelRatio = pixelRatio;
     this._fillWindow = fillWindow;
     if (fillWindow) {

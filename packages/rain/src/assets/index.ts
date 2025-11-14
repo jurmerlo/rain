@@ -1,4 +1,4 @@
-export { AssetLoader, type AssetLoadOptions } from './assetLoader.js';
+export { AssetLoader, type AssetLoadOptions, type ClassType } from './assetLoader.js';
 export { type AssetItem, Assets } from './assets.js';
 export { AtlasLoader } from './atlasLoader.js';
 export { BitmapFontLoader } from './bitmapFontLoader.js';
