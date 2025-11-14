@@ -119,7 +119,7 @@ export class ImageRenderer extends BaseRenderer {
     this.shader.applyBlendMode();
 
     const gl = this.glContext.gl;
-    gl.uniformMatrix4fv(this.shader.uniforms.u_projectionMatrix, false, this.projection.value);
+    gl.uniformMatrix4fv(this.shader.uniforms.u_projection, false, this.projection.value);
     gl.activeTexture(gl.TEXTURE0);
     if (this.currentTarget) {
       gl.bindTexture(gl.TEXTURE_2D, this.currentTarget.texture);
@@ -137,27 +137,20 @@ export class ImageRenderer extends BaseRenderer {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indexIndices, gl.STATIC_DRAW);
 
-    gl.vertexAttribPointer(this.shader.vertexPositionLocation, 3, gl.FLOAT, false, this.FLOAT_SIZE * 9, 0);
-    gl.enableVertexAttribArray(this.shader.vertexPositionLocation);
-    gl.vertexAttribPointer(
-      this.shader.vertexColorLocation,
-      4,
-      gl.FLOAT,
-      false,
-      this.FLOAT_SIZE * 9,
-      this.FLOAT_SIZE * 3,
-    );
-    gl.enableVertexAttribArray(this.shader.vertexColorLocation);
-    gl.vertexAttribPointer(this.shader.vertexUVLocation, 2, gl.FLOAT, false, this.FLOAT_SIZE * 9, this.FLOAT_SIZE * 7);
-    gl.enableVertexAttribArray(this.shader.vertexUVLocation);
+    gl.vertexAttribPointer(this.shader.positionLocation, 3, gl.FLOAT, false, this.FLOAT_SIZE * 9, 0);
+    gl.enableVertexAttribArray(this.shader.positionLocation);
+    gl.vertexAttribPointer(this.shader.colorLocation, 4, gl.FLOAT, false, this.FLOAT_SIZE * 9, this.FLOAT_SIZE * 3);
+    gl.enableVertexAttribArray(this.shader.colorLocation);
+    gl.vertexAttribPointer(this.shader.uvLocation, 2, gl.FLOAT, false, this.FLOAT_SIZE * 9, this.FLOAT_SIZE * 7);
+    gl.enableVertexAttribArray(this.shader.uvLocation);
 
     gl.drawElements(gl.TRIANGLES, this.index * INDICES_PER_QUAD, gl.UNSIGNED_INT, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-    gl.disableVertexAttribArray(this.shader.vertexPositionLocation);
-    gl.disableVertexAttribArray(this.shader.vertexColorLocation);
-    gl.disableVertexAttribArray(this.shader.vertexUVLocation);
+    gl.disableVertexAttribArray(this.shader.positionLocation);
+    gl.disableVertexAttribArray(this.shader.colorLocation);
+    gl.disableVertexAttribArray(this.shader.uvLocation);
 
     this.index = 0;
     this.currentImage = undefined;

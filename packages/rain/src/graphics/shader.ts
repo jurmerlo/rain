@@ -20,18 +20,21 @@ export class Shader {
   /**
    * The location of the vertex position attribute.
    */
-  readonly vertexPositionLocation = 0;
+  readonly positionLocation = 0;
 
   /**
    * The location of the vertex color attribute.
    */
-  readonly vertexColorLocation = 1;
+  readonly colorLocation = 1;
 
   /**
    * The location of the vertex UV attribute if this is an image shader.
    */
-  readonly vertexUVLocation = 2;
+  readonly uvLocation = 2;
 
+  /**
+   * All uniform locations for the shader.
+   */
   readonly uniforms: Record<string, WebGLUniformLocation>;
 
   /**
@@ -81,12 +84,12 @@ export class Shader {
 
     this.program = this.createProgram(gl, vertexShader, fragmentShader);
 
-    const projection = this.getUniformLocation('u_projectionMatrix');
+    const projection = this.getUniformLocation('u_projection');
     if (!projection) {
-      throw new Error('projectionMatrix not available in the vertex shader');
+      throw new Error('projection not available in the vertex shader');
     }
-    this.uniforms.u_projectionMatrix = projection;
 
+    this.uniforms.u_projection = projection;
     if (type === 'image') {
       const texture = this.getUniformLocation('u_texture');
       if (!texture) {
@@ -250,11 +253,11 @@ export class Shader {
         throw new Error(`Error while linking shader program: ${error}`);
       }
 
-      gl.bindAttribLocation(program, this.vertexPositionLocation, 'a_vertexPosition');
-      gl.bindAttribLocation(program, this.vertexColorLocation, 'a_vertexColor');
+      gl.bindAttribLocation(program, this.positionLocation, 'a_position');
+      gl.bindAttribLocation(program, this.colorLocation, 'a_color');
 
       if (this.type === 'image') {
-        gl.bindAttribLocation(program, this.vertexUVLocation, 'a_vertexUV');
+        gl.bindAttribLocation(program, this.uvLocation, 'a_uv');
       }
 
       return program;

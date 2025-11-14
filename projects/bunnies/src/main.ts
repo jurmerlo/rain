@@ -6,7 +6,6 @@ createRainWithScenes({
   designWidth: 800,
   designHeight: 600,
   startScene: LoadState,
-  fillWindow: true,
 });
 
 if (isMobile()) {

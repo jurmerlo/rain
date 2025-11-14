@@ -1,17 +1,18 @@
 import type { Audio } from '../audio/audio.js';
 import { Sound } from '../audio/sound.js';
 import { inject } from '../di/inject.js';
-import { AssetLoader, type AssetLoaderLoadParams } from './assetLoader.js';
+import { AssetLoader, type AssetLoadOptions } from './assetLoader.js';
 
 export class SoundLoader extends AssetLoader<Sound> {
   @inject()
-  private audio!: Audio;
+  private readonly audio!: Audio;
 
   constructor() {
     super(Sound);
   }
 
-  async load({ id, path, keep = true }: AssetLoaderLoadParams): Promise<Sound> {
+  async load(id: string, path: string, options?: AssetLoadOptions): Promise<Sound> {
+    const keep = options?.keep ?? true;
     const response = await fetch(path);
     if (response.status < 400) {
       const buffer = await response.arrayBuffer();

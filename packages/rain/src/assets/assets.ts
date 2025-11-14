@@ -1,4 +1,4 @@
-import type { AssetLoader } from './assetLoader.js';
+import type { AssetLoader, AssetLoadOptions } from './assetLoader.js';
 
 export type AssetItem = {
   type: new (
@@ -8,17 +8,6 @@ export type AssetItem = {
   id: string;
   path: string;
   props?: unknown;
-};
-
-export type AssetsLoadParams<T> = {
-  type: new (
-    // biome-ignore lint/suspicious/noExplicitAny: Asset items can take any parameters.
-    ...args: any[]
-  ) => T;
-  id: string;
-  path: string;
-  props?: unknown;
-  keep?: boolean;
 };
 
 /**
@@ -53,12 +42,19 @@ export class Assets {
    * @param keep Should this asset be stored.
    * @returns The loaded asset.
    */
-  load<T>({ type, id, path, props, keep = true }: AssetsLoadParams<T>): Promise<T> {
+  // biome-ignore lint/suspicious/noExplicitAny: Asset type constructor can take any parameters.
+  load<T>(type: new (...args: any[]) => T, id: string, path: string, options?: AssetLoadOptions): Promise<T> {
+    if (!options) {
+      options = { keep: true };
+    } else if (options.keep === undefined) {
+      options.keep = true;
+    }
+
     return new Promise((resolve, reject) => {
       const loader = this.loaders.get(type);
       if (loader) {
         loader
-          .load({ id, path, props, keep })
+          .load(id, path, options)
           .then((value) => {
             resolve(value as T);
           })
@@ -81,7 +77,7 @@ export class Assets {
       let loaded = 0;
 
       for (const props of assets) {
-        this.load(props)
+        this.load(props.type, props.id, props.path, { props: props.props, keep: true })
           .then(() => {
             loaded++;
             if (loaded === count) {

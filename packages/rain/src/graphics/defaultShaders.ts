@@ -3,16 +3,16 @@ import { glsl } from './glContext.js';
 const SHAPE_VERT: string = glsl`
   #version 300 es
 
-  in vec3 a_vertexPosition;
-  in vec4 a_vertexColor;
+  in vec3 a_position;
+  in vec4 a_color;
 
-  uniform mat4 u_projectionMatrix;
+  uniform mat4 u_projection;
 
-  out vec4 v_fragmentColor;
+  out vec4 v_color;
 
   void main() {
-    gl_Position = u_projectionMatrix * vec4(a_vertexPosition, 1.0);
-    v_fragmentColor = a_vertexColor;
+    gl_Position = u_projection * vec4(a_position, 1.0);
+    v_color = a_color;
   }
 `;
 
@@ -21,28 +21,28 @@ const SHAPE_FRAG: string = glsl`
 
   precision mediump float;
 
-  in vec4 v_fragmentColor;
+  in vec4 v_color;
 
-  out vec4 o_fragmentColor;
+  out vec4 o_color;
 
   void main() {
-    o_fragmentColor = v_fragmentColor;
+    o_color = v_color;
   }
 `;
 
 const SHAPE_VERT_GL1: string = glsl`
   #version 100
 
-  attribute vec3 a_vertexPosition;
-  attribute vec4 a_vertexColor;
+  attribute vec3 a_position;
+  attribute vec4 a_color;
 
-  uniform mat4 u_projectionMatrix;
+  uniform mat4 u_projection;
 
-  varying vec4 v_fragmentColor;
+  varying vec4 v_color;
 
   void main() {
-    gl_Position = u_projectionMatrix * vec4(a_vertexPosition, 1.0);
-    v_fragmentColor = a_vertexColor;
+    gl_Position = u_projection * vec4(a_position, 1.0);
+    v_color = a_color;
   }
 `;
 
@@ -51,29 +51,29 @@ const SHAPE_FRAG_GL1: string = glsl`
 
   precision mediump float;
 
-  varying vec4 v_fragmentColor;
+  varying vec4 v_color;
 
   void main() {
-    gl_FragColor = v_fragmentColor;
+    gl_FragColor = v_color;
   }
 `;
 
 const IMAGE_VERT: string = glsl`
   #version 300 es
 
-  in vec3 a_vertexPosition;
-  in vec4 a_vertexColor;
-  in vec2 a_vertexUV;
+  in vec3 a_position;
+  in vec4 a_color;
+  in vec2 a_uv;
 
-  uniform mat4 u_projectionMatrix;
+  uniform mat4 u_projection;
 
-  out vec2 v_fragmentUV;
-  out vec4 v_fragmentColor;
+  out vec2 v_uv;
+  out vec4 v_color;
 
   void main() {
-    gl_Position = u_projectionMatrix * vec4(a_vertexPosition, 1.0);
-    v_fragmentUV = a_vertexUV;
-    v_fragmentColor = a_vertexColor;
+    gl_Position = u_projection * vec4(a_position, 1.0);
+    v_uv = a_uv;
+    v_color = a_color;
   }
 `;
 
@@ -84,34 +84,34 @@ const IMAGE_FRAG: string = glsl`
 
   uniform sampler2D u_texture;
 
-  in vec2 v_fragmentUV;
-  in vec4 v_fragmentColor;
+  in vec2 v_uv;
+  in vec4 v_color;
 
-  out vec4 o_fragmentColor;
+  out vec4 o_color;
 
   void main() {
-    vec4 textureColor = texture(u_texture, v_fragmentUV) * v_fragmentColor;
-    textureColor.rgb *= v_fragmentColor.a;
-    o_fragmentColor = textureColor;
+    vec4 color = texture(u_texture, v_uv) * v_color;
+    color.rgb *= v_color.a;
+    o_color = color;
   }
 `;
 
 const IMAGE_VERT_GL1: string = glsl`
   #version 100
 
-  attribute vec3 a_vertexPosition;
-  attribute vec4 a_vertexColor;
-  attribute vec2 a_vertexUV;
+  attribute vec3 a_position;
+  attribute vec4 a_color;
+  attribute vec2 a_uv;
 
-  uniform mat4 u_projectionMatrix;
+  uniform mat4 u_projection;
 
-  varying vec2 v_fragmentUV;
-  varying vec4 v_fragmentColor;
+  varying vec2 v_uv;
+  varying vec4 v_color;
 
   void main() {
-    gl_Position = u)projectionMatrix * vec4(a_vertexPosition, 1.0);
-    v_fragmentUV = a_vertexUV;
-    v_fragmentColor = a_vertexColor;
+    gl_Position = u_projection * vec4(a_position, 1.0);
+    v_uv = a_uv;
+    v_color = a_color;
   }
 `;
 
@@ -122,13 +122,13 @@ const IMAGE_FRAG_GL1: string = glsl`
 
   uniform sampler2D u_texture;
 
-  varying vec2 v_fragmentUV;
-  varying vec4 v_fragmentColor;
+  varying vec2 v_uv;
+  varying vec4 v_color;
 
   void main() {
-    vec4 textureColor = texture2D(u_texture, v_fragmentUV) * v_fragmentColor;
-    textureColor.rgb *= v_fragmentColor.a;
-    gl_FragColor = textureColor;
+    vec4 color = texture2D(u_texture, v_uv) * v_color;
+    color.rgb *= v_color.a;
+    gl_FragColor = color;
   }
 `;
 

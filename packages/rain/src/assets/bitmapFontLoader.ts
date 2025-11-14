@@ -1,7 +1,7 @@
 import { inject } from '../di/inject.js';
 import { BitmapFont } from '../graphics/bitmapFont.js';
 import { Image } from '../graphics/image.js';
-import { AssetLoader, type AssetLoaderLoadParams } from './assetLoader.js';
+import { AssetLoader, type AssetLoadOptions } from './assetLoader.js';
 import type { Assets } from './assets.js';
 
 export class BitmapFontLoader extends AssetLoader<BitmapFont> {
@@ -12,9 +12,10 @@ export class BitmapFontLoader extends AssetLoader<BitmapFont> {
     super(BitmapFont);
   }
 
-  async load({ id, path, keep = true }: AssetLoaderLoadParams): Promise<BitmapFont> {
-    const image = await this.assets.load({ type: Image, id: `rain_bitmap_font_${id}`, path: `${path}.png`, keep });
-    const data = await this.assets.load({ type: String, id: `rain_bitmap_font_${id}`, path: `${path}.fnt`, keep });
+  async load(id: string, path: string, options?: AssetLoadOptions): Promise<BitmapFont> {
+    const keep = options?.keep ?? true;
+    const image = await this.assets.load(Image, `rain_bitmap_font_${id}`, `${path}.png`, { keep });
+    const data = await this.assets.load(String, `rain_bitmap_font_${id}`, `${path}.fnt`, { keep });
 
     const font = new BitmapFont(image, data.valueOf());
     if (keep) {

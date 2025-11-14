@@ -17,7 +17,9 @@ export class Emitter<T extends Record<string, any[]>> {
 
   /**
    * Registers an event handler.
-   * @param params - The event parameters.
+   * @param event - The event to register the handler for.
+   * @param callback - The callback function to execute when the event is emitted.
+   * @param filter - An optional filter function to determine if the callback should be executed.
    * @returns The registered event handler.
    */
   on<K extends keyof T>(

@@ -33,13 +33,14 @@ export class Input {
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
-
     this.addListeners();
   }
 
   /**
    * Registers an event listener for a specific input event.
-   * @param params - The parameters for the event listener.
+   * @param event - The event to register the listener for.
+   * @param callback - The callback function to execute when the event is emitted.
+   * @param filter - An optional filter function to determine if the callback should be executed.
    * @returns The handler for the event listener.
    */
   on<K extends keyof InputEvents>(

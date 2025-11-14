@@ -36,7 +36,7 @@ export type ScaleModeResult = {
 /**
  * The parameters passed into a scale mode function.
  */
-export type ScaleModeParams = {
+export type ScaleModeOptions = {
   /**
    * The width in pixels the game is designed for before scaling.
    */
@@ -71,11 +71,11 @@ export type ScaleModeParams = {
 /**
  * The scale mode function blueprint.
  */
-export type ScaleMode = (params: ScaleModeParams) => ScaleModeResult;
+export type ScaleMode = (options: ScaleModeOptions) => ScaleModeResult;
 
 /**
  * Scale the view to fit the canvas. Will cut off parts of the view to make it fit. Keeps aspect ratio.
- * @param params The scale mode parameters.
+ * @param options The scale mode options.
  * @return The scaled values.
  */
 export function scaleModeFitView({
@@ -85,7 +85,7 @@ export function scaleModeFitView({
   canvasHeight,
   anchorX,
   anchorY,
-}: ScaleModeParams): ScaleModeResult {
+}: ScaleModeOptions): ScaleModeResult {
   const designRatio = designWidth / designHeight;
   const canvasRatio = canvasWidth / canvasHeight;
 
@@ -116,7 +116,7 @@ export function scaleModeFitView({
 
 /**
  * Scale the view to fit the design resolution.
- * @param params The scale mode parameters.
+ * @param options The scale mode options.
  * @return The scaled values.
  */
 export function scaleModeFitDesign({
@@ -126,7 +126,7 @@ export function scaleModeFitDesign({
   canvasHeight,
   anchorX,
   anchorY,
-}: ScaleModeParams): ScaleModeResult {
+}: ScaleModeOptions): ScaleModeResult {
   const designRatio = designWidth / designHeight;
   const canvasRatio = canvasWidth / canvasHeight;
 
@@ -157,7 +157,7 @@ export function scaleModeFitDesign({
 
 /**
  * Scale the view to fit the width of the canvas. Will cut off parts at the top and bottom to fit. Keeps aspect ratio.
- * @param params The scale mode parameters.
+ * @param options The scale mode options.
  * @return The scaled values.
  */
 export function scaleModeFitWidth({
@@ -167,7 +167,7 @@ export function scaleModeFitWidth({
   canvasHeight,
   anchorX,
   anchorY,
-}: ScaleModeParams): ScaleModeResult {
+}: ScaleModeOptions): ScaleModeResult {
   const canvasRatio = canvasWidth / canvasHeight;
   const viewWidth = designWidth;
   const viewHeight = Math.ceil(viewWidth / canvasRatio);
@@ -187,7 +187,7 @@ export function scaleModeFitWidth({
 
 /**
  * Scale the view to fit the height of the canvas. Will cut off parts at the left and right to fit. Keeps aspect ratio.
- * @param params The scale mode parameters.
+ * @param options The scale mode options.
  * @return The scaled values.
  */
 export function scaleModeFitHeight({
@@ -197,7 +197,7 @@ export function scaleModeFitHeight({
   canvasHeight,
   anchorX,
   anchorY,
-}: ScaleModeParams): ScaleModeResult {
+}: ScaleModeOptions): ScaleModeResult {
   const canvasRatio = canvasWidth / canvasHeight;
   const viewHeight = designHeight;
   const viewWidth = Math.ceil(viewHeight * canvasRatio);
@@ -219,7 +219,7 @@ export function scaleModeFitHeight({
 
 /**
  * Don't scale the view. Just offset it inside the canvas if needed.
- * @param params The scale mode parameters.
+ * @param options The scale mode options.
  * @return The scaled values.
  */
 export function scaleModeNoScale({
@@ -229,7 +229,7 @@ export function scaleModeNoScale({
   canvasHeight,
   anchorX,
   anchorY,
-}: ScaleModeParams): ScaleModeResult {
+}: ScaleModeOptions): ScaleModeResult {
   const offsetX = (canvasWidth - designWidth) * anchorX;
   const offsetY = (canvasHeight - designHeight) * anchorY;
 
@@ -245,7 +245,7 @@ export function scaleModeNoScale({
 
 /**
  * Stretch the view to fit the canvas. Does not keep the aspect ratio and can distort the view.
- * @param params The scale mode parameters.
+ * @param options The scale mode options.
  * @return The scaled values.
  */
 export function scaleModeStretch({
@@ -253,7 +253,7 @@ export function scaleModeStretch({
   designHeight,
   canvasWidth,
   canvasHeight,
-}: ScaleModeParams): ScaleModeResult {
+}: ScaleModeOptions): ScaleModeResult {
   const viewWidth = designWidth;
   const viewHeight = designHeight;
 

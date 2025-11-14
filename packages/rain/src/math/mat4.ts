@@ -461,13 +461,12 @@ export class Mat4 {
 
   /**
    * Set an orthographic projection matrix.
-   * @param params - The parameters for the orthographic projection.
-   * @param params.left - The left side of the view.
-   * @param params.right - The right side of the view.
-   * @param params.bottom - The bottom side of the view.
-   * @param params.top - The top side of the view.
-   * @param params.near - The near clipping plane.
-   * @param params.far - The far clipping plane.
+   * @param left - The left side of the view.
+   * @param right - The right side of the view.
+   * @param bottom - The bottom side of the view.
+   * @param top - The top side of the view.
+   * @param near - The near clipping plane.
+   * @param far - The far clipping plane.
    */
 
   // biome-ignore lint/nursery/useMaxParams: This function can be called a lot of times, so keeping params in a single object would be less efficient.

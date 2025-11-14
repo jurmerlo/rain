@@ -1,7 +1,7 @@
 import { AudioChannel } from './audioChannel.js';
 import { Sound } from './sound.js';
 
-export type PlayParams = {
+export type PlayOptions = {
   sound: Sound;
   loop?: number;
   volume?: number;
@@ -122,7 +122,7 @@ export class Audio {
    * @param startTime - The position to start the sound.
    * @returns The channel id the sound is playing on.
    */
-  play({ sound, loop = 0, volume = 1, channelId = -1, startTime = 0 }: PlayParams): number {
+  play({ sound, loop = 0, volume = 1, channelId = -1, startTime = 0 }: PlayOptions): number {
     const id = channelId !== -1 ? channelId : this.getFreeChannel();
     if (id === -1) {
       throw new Error('Unable to play sound. All audio channels are in use.');

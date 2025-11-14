@@ -1,9 +1,4 @@
-/**
- * Parameters needed to load an asset.
- */
-export type AssetLoaderLoadParams = {
-  id: string;
-  path: string;
+export type AssetLoadOptions = {
   props?: unknown;
   keep?: boolean;
 };
@@ -27,7 +22,7 @@ export abstract class AssetLoader<T> {
 
   /**
    * Create a new loader instance.
-   * @param assetType The type of asset to manage.
+   * @param assetType - The type of asset to manage.
    */
 
   // biome-ignore lint/suspicious/noExplicitAny: Asset type constructor can take any parameters.
@@ -37,14 +32,16 @@ export abstract class AssetLoader<T> {
 
   /**
    * Load an asset. This needs to be implemented per loader.
-   * @param params The parameters needed to load the asset.
+   * @param id - The id used to reference the asset.
+   * @param path - The url path to the asset.
+   * @param options - Any other properties needed to load the asset.
    */
-  abstract load(params: AssetLoaderLoadParams): Promise<T>;
+  abstract load(id: string, path: string, options?: AssetLoadOptions): Promise<T>;
 
   /**
    * Add an externally loaded asset to the loader.
-   * @param id The id used to reference the asset.
-   * @param instance The asset instance to add.
+   * @param id - The id used to reference the asset.
+   * @param instance - The asset instance to add.
    */
   add(id: string, instance: T): void {
     this.loadedAssets[id] = instance;
@@ -52,7 +49,7 @@ export abstract class AssetLoader<T> {
 
   /**
    * Get a loaded asset by id.
-   * @param id The id of the asset to load.
+   * @param id - The id of the asset to load.
    * @returns The loaded asset. Will throw if the asset does not exist.
    */
   get(id: string): T {
@@ -65,7 +62,7 @@ export abstract class AssetLoader<T> {
 
   /**
    * Unload a loaded asset.
-   * @param id The id of the asset to unload.
+   * @param id - The id of the asset to unload.
    * @returns True if the unload wsa successful.
    */
   unload(id: string): boolean {

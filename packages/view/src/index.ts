@@ -1,7 +1,7 @@
 export { Camera, type CameraOptions } from './camera.js';
 export {
   type ScaleMode,
-  type ScaleModeParams,
+  type ScaleModeOptions,
   type ScaleModeResult,
   scaleModeFitDesign,
   scaleModeFitHeight,

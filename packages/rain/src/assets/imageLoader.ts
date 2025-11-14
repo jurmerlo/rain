@@ -1,12 +1,14 @@
 import { Image } from '../graphics/image.js';
-import { AssetLoader, type AssetLoaderLoadParams } from './assetLoader.js';
+import { AssetLoader, type AssetLoadOptions } from './assetLoader.js';
 
 export class ImageLoader extends AssetLoader<Image> {
   constructor() {
     super(Image);
   }
 
-  load({ id, path, keep = true }: AssetLoaderLoadParams): Promise<Image> {
+  load(id: string, path: string, options?: AssetLoadOptions): Promise<Image> {
+    const keep = options?.keep ?? true;
+
     return new Promise((resolve, reject) => {
       const element = document.createElement('img');
       element.onload = (): void => {
