@@ -59,7 +59,8 @@ export type CameraOptions = {
 };
 
 /**
- * Camera class.
+ * A camera that controls the view and rendering of a scene.
+ * Manages viewport positioning, rotation, zoom, and provides coordinate transformation utilities.
  */
 export class Camera {
   /**
@@ -112,10 +113,19 @@ export class Camera {
    */
   viewRect = new Rectangle();
 
+  /**
+   * Temporary matrix for calculations.
+   */
   private tempMatrix = new Mat4();
 
+  /**
+   * The screen position of the camera.
+   */
   private screenPosition = new Vec2();
 
+  /**
+   * The view instance.
+   */
   @inject()
   private view!: View;
 
@@ -162,6 +172,7 @@ export class Camera {
    * Converts screen coordinates to world coordinates.
    * @param x - The x-coordinate on the screen.
    * @param y - The y-coordinate on the screen.
+   * @param out - Optional Vec2 to store the result. If not provided, a new Vec2 is created.
    * @returns The corresponding world coordinates.
    */
   screenToWorld(x: number, y: number, out?: Vec2): Vec2 {
@@ -178,7 +189,12 @@ export class Camera {
     const tempPos = Vec2.get(tempX, tempY);
     const tempCenter = Vec2.get(this.position.x, this.position.y);
 
-    return rotateAround(tempPos, tempCenter, -this.rotation, out);
+    const result = rotateAround(tempPos, tempCenter, -this.rotation, out);
+
+    Vec2.put(tempPos);
+    Vec2.put(tempCenter);
+
+    return result;
   }
 
   /**
@@ -204,6 +220,11 @@ export class Camera {
     );
     this.screenPosition.set(this.screenBounds.x, this.screenBounds.y);
 
+    // Destroy old render target if it exists to prevent memory leak
+    if (this.target) {
+      this.target.destroy();
+    }
+
     this.target = new RenderTarget(widthCl * this.view.viewWidth, heightCl * this.view.viewHeight);
   }
 
@@ -214,6 +235,11 @@ export class Camera {
     this.updateView(this.viewRect.x, this.viewRect.y, this.viewRect.width, this.viewRect.height);
   }
 
+  /**
+   * Draws camera content to the target using the provided graphics context.
+   * @param graphics - The graphics context to draw with.
+   * @param drawFunc - The function that performs the drawing operations.
+   */
   drawContent(graphics: Graphics, drawFunc: (graphics: Graphics) => void): void {
     if (!this.active) {
       return;
@@ -231,6 +257,10 @@ export class Camera {
     graphics.popTarget();
   }
 
+  /**
+   * Draws the camera content to the screen.
+   * @param graphics - The graphics context to draw with.
+   */
   drawSelf(graphics: Graphics): void {
     if (!this.active) {
       return;
@@ -243,6 +273,8 @@ export class Camera {
    * Destroys the camera and releases its resources.
    */
   destroy(): void {
-    this.target.destroy();
+    if (this.target) {
+      this.target.destroy();
+    }
   }
 }

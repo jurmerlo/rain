@@ -8,7 +8,7 @@ export type ScaleModeResult = {
   viewWidth: number;
 
   /**
-   * The scaled game view heigh in pixels.
+   * The scaled game view height in pixels.
    */
   viewHeight: number;
 
@@ -75,8 +75,8 @@ export type ScaleMode = (options: ScaleModeOptions) => ScaleModeResult;
 
 /**
  * Scale the view to fit the canvas. Will cut off parts of the view to make it fit. Keeps aspect ratio.
- * @param options The scale mode options.
- * @return The scaled values.
+ * @param options - The scale mode options.
+ * @returns The scaled values.
  */
 export function scaleModeFitView({
   designWidth,
@@ -89,8 +89,8 @@ export function scaleModeFitView({
   const designRatio = designWidth / designHeight;
   const canvasRatio = canvasWidth / canvasHeight;
 
-  let viewWidth = 0;
-  let viewHeight = 0;
+  let viewWidth: number;
+  let viewHeight: number;
   if (canvasRatio < designRatio) {
     viewWidth = designWidth;
     viewHeight = Math.ceil(viewWidth / canvasRatio);
@@ -105,19 +105,19 @@ export function scaleModeFitView({
   const offsetY = (canvasHeight - designHeight * scaleFactor) * anchorY;
 
   return {
-    viewWidth: viewWidth,
-    viewHeight: viewHeight,
+    viewWidth,
+    viewHeight,
     scaleFactorX: scaleFactor,
     scaleFactorY: scaleFactor,
-    offsetX: offsetX,
-    offsetY: offsetY,
+    offsetX,
+    offsetY,
   };
 }
 
 /**
  * Scale the view to fit the design resolution.
- * @param options The scale mode options.
- * @return The scaled values.
+ * @param options - The scale mode options.
+ * @returns The scaled values.
  */
 export function scaleModeFitDesign({
   designWidth,
@@ -130,8 +130,8 @@ export function scaleModeFitDesign({
   const designRatio = designWidth / designHeight;
   const canvasRatio = canvasWidth / canvasHeight;
 
-  let viewWidth = 0;
-  let viewHeight = 0;
+  let viewWidth: number;
+  let viewHeight: number;
   if (canvasRatio > designRatio) {
     viewWidth = designWidth;
     viewHeight = Math.ceil(viewWidth / canvasRatio);
@@ -146,19 +146,19 @@ export function scaleModeFitDesign({
   const offsetY = (canvasHeight - designHeight * scaleFactor) * anchorY;
 
   return {
-    viewWidth: viewWidth,
-    viewHeight: viewHeight,
+    viewWidth,
+    viewHeight,
     scaleFactorX: scaleFactor,
     scaleFactorY: scaleFactor,
-    offsetX: offsetX,
-    offsetY: offsetY,
+    offsetX,
+    offsetY,
   };
 }
 
 /**
  * Scale the view to fit the width of the canvas. Will cut off parts at the top and bottom to fit. Keeps aspect ratio.
- * @param options The scale mode options.
- * @return The scaled values.
+ * @param options - The scale mode options.
+ * @returns The scaled values.
  */
 export function scaleModeFitWidth({
   designWidth,
@@ -176,19 +176,19 @@ export function scaleModeFitWidth({
   const offsetY = (canvasHeight - designHeight * scaleFactor) * anchorY;
 
   return {
-    viewWidth: viewWidth,
-    viewHeight: viewHeight,
+    viewWidth,
+    viewHeight,
     scaleFactorX: scaleFactor,
     scaleFactorY: scaleFactor,
-    offsetX: offsetX,
-    offsetY: offsetY,
+    offsetX,
+    offsetY,
   };
 }
 
 /**
  * Scale the view to fit the height of the canvas. Will cut off parts at the left and right to fit. Keeps aspect ratio.
- * @param options The scale mode options.
- * @return The scaled values.
+ * @param options - The scale mode options.
+ * @returns The scaled values.
  */
 export function scaleModeFitHeight({
   designWidth,
@@ -208,19 +208,19 @@ export function scaleModeFitHeight({
   const offsetY = (canvasHeight - designHeight * scaleFactor) * anchorY;
 
   return {
-    viewWidth: viewWidth,
-    viewHeight: viewHeight,
+    viewWidth,
+    viewHeight,
     scaleFactorX: scaleFactor,
     scaleFactorY: scaleFactor,
-    offsetX: offsetX,
-    offsetY: offsetY,
+    offsetX,
+    offsetY,
   };
 }
 
 /**
  * Don't scale the view. Just offset it inside the canvas if needed.
- * @param options The scale mode options.
- * @return The scaled values.
+ * @param options - The scale mode options.
+ * @returns The scaled values.
  */
 export function scaleModeNoScale({
   designWidth,
@@ -238,15 +238,15 @@ export function scaleModeNoScale({
     viewHeight: designHeight,
     scaleFactorX: 1.0,
     scaleFactorY: 1.0,
-    offsetX: offsetX,
-    offsetY: offsetY,
+    offsetX,
+    offsetY,
   };
 }
 
 /**
  * Stretch the view to fit the canvas. Does not keep the aspect ratio and can distort the view.
- * @param options The scale mode options.
- * @return The scaled values.
+ * @param options - The scale mode options.
+ * @returns The scaled values.
  */
 export function scaleModeStretch({
   designWidth,
@@ -261,10 +261,10 @@ export function scaleModeStretch({
   const scaleFactorY = canvasHeight / viewHeight;
 
   return {
-    viewWidth: viewWidth,
-    viewHeight: viewHeight,
-    scaleFactorX: scaleFactorX,
-    scaleFactorY: scaleFactorY,
+    viewWidth,
+    viewHeight,
+    scaleFactorX,
+    scaleFactorY,
     offsetX: 0,
     offsetY: 0,
   };
