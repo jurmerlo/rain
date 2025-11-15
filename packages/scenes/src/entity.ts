@@ -1,5 +1,6 @@
 import type { Graphics } from '@rain2d/rain/graphics';
 import { Transform } from '@rain2d/rain/math';
+import type { Camera } from '@rain2d/view';
 
 /**
  * Base class for all game entities in a scene hierarchy.
@@ -27,6 +28,11 @@ export class Entity {
   parent: Entity | null = null;
 
   /**
+   * A tag to identify the entity.
+   */
+  tag: string;
+
+  /**
    * Child entities that belong to this entity.
    */
   readonly entities: Entity[];
@@ -35,6 +41,11 @@ export class Entity {
    * Internal queue of entities pending removal on the next update cycle.
    */
   private readonly entitiesToRemove: Entity[];
+
+  /**
+   * Indicates whether this entity should be destroyed when removed.
+   */
+  private shouldDestroy: boolean;
 
   /**
    * Creates a new entity.
@@ -46,6 +57,8 @@ export class Entity {
     this.entitiesToRemove = [];
     this.transform = new Transform();
     this.useTransform = true;
+    this.shouldDestroy = false;
+    this.tag = 'default';
   }
 
   /**
@@ -60,19 +73,32 @@ export class Entity {
     } else {
       this.entities.push(entity);
     }
+    entity.onAdded();
   }
 
   /**
    * Removes a child entity from this entity.
    * The entity will be queued for removal and destroyed on the next update cycle.
    * @param entity - The entity to remove.
+   * @param destroy - Whether to destroy the entity after removal. Defaults to true.
    */
-  remove(entity: Entity): void {
+  remove(entity: Entity, destroy: boolean = true): void {
     if (entity.parent === this) {
       entity.parent = null;
     }
+    entity.shouldDestroy = destroy;
     this.entitiesToRemove.push(entity);
   }
+
+  /**
+   * Called when this entity is added to a parent entity.
+   */
+  onAdded(): void {}
+
+  /**
+   * Called when this entity is removed from its parent entity.
+   */
+  onRemoved(): void {}
 
   /**
    * Updates this entity and all active child entities.
@@ -82,10 +108,13 @@ export class Entity {
     while (this.entitiesToRemove.length > 0) {
       const entity = this.entitiesToRemove.pop();
       if (entity) {
-        entity.destroy();
         const index = this.entities.indexOf(entity);
         if (index !== -1) {
           this.entities.splice(index, 1);
+        }
+        entity.onRemoved();
+        if (entity.shouldDestroy) {
+          entity.destroy();
         }
       }
     }
@@ -101,17 +130,18 @@ export class Entity {
    * Draws this entity and all active child entities.
    * If useTransform is true, applies the entity's transform matrix before drawing.
    * @param graphics - The graphics context to draw to.
+   * @param camera - Optional camera used for rendering.
    */
-  draw(graphics: Graphics): void {
+  draw(graphics: Graphics, camera?: Camera): void {
     if (this.useTransform) {
       this.transform.update();
       graphics.pushTransform();
       graphics.applyTransform(this.transform.matrix);
-      this.drawWithTransform(graphics);
+      this.drawWithTransform(graphics, camera);
     }
     for (const entity of this.entities) {
       if (entity.active) {
-        entity.draw(graphics);
+        entity.draw(graphics, camera);
       }
     }
     if (this.useTransform) {
@@ -122,9 +152,11 @@ export class Entity {
   /**
    * Override this method to implement custom drawing with the entity's transform applied.
    * Called after the transform is pushed but before child entities are drawn.
-   * @param _graphics - The graphics context to draw to.
+   * @param graphics - The graphics context to draw to.
+   * @param camera - Optional camera used for rendering.
    */
-  drawWithTransform(_graphics: Graphics): void {}
+
+  drawWithTransform(_graphics: Graphics, _camera?: Camera): void {}
 
   /**
    * Destroys this entity and all child entities, cleaning up resources.

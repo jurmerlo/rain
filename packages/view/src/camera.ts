@@ -53,9 +53,9 @@ export type CameraOptions = {
   bgColor?: Color;
 
   /**
-   * The render layers that should be ignored by the camera.
+   * A tag to identify the camera.
    */
-  ignoredLayers?: number[];
+  tag?: string;
 };
 
 /**
@@ -71,37 +71,32 @@ export class Camera {
   /**
    * The center position of the camera.
    */
-  position = new Vec2();
+  position: Vec2;
 
   /**
    * The rotation angle of the camera in degrees.
    */
-  rotation = 0;
+  rotation: number;
 
   /**
    * The zoom level of the camera.
    */
-  zoom = 1;
+  zoom: number;
 
   /**
    * The transformation matrix of the camera.
    */
-  transform = new Mat4();
+  transform: Mat4;
 
   /**
    * The background color of the camera.
    */
-  bgColor = new Color(0, 0, 0);
-
-  /**
-   * The render layers that should be ignored by the camera.
-   */
-  ignoredLayers: number[] = [];
+  bgColor: Color;
 
   /**
    * The screen bounds of the camera.
    */
-  screenBounds = new Rectangle();
+  screenBounds: Rectangle;
 
   /**
    * The render canvas used by the camera.
@@ -111,17 +106,22 @@ export class Camera {
   /**
    * The view rectangle of the camera.
    */
-  viewRect = new Rectangle();
+  viewRect: Rectangle;
+
+  /**
+   * A tag to identify the camera.
+   */
+  tag: string;
 
   /**
    * Temporary matrix for calculations.
    */
-  private tempMatrix = new Mat4();
+  private tempMatrix: Mat4;
 
   /**
    * The screen position of the camera.
    */
-  private screenPosition = new Vec2();
+  private screenPosition: Vec2;
 
   /**
    * The view instance.
@@ -133,23 +133,17 @@ export class Camera {
    * Creates a new Camera instance.
    * @param options - The camera creation options.
    */
-  constructor({
-    bgColor,
-    ignoredLayers,
-    rotation,
-    viewX,
-    viewY,
-    viewHeight,
-    viewWidth,
-    x,
-    y,
-    zoom,
-  }: CameraOptions = {}) {
-    this.position.set(x ?? this.view.viewWidth * 0.5, y ?? this.view.viewHeight * 0.5);
+  constructor({ bgColor, rotation, tag, viewX, viewY, viewHeight, viewWidth, x, y, zoom }: CameraOptions = {}) {
+    this.position = new Vec2(x ?? this.view.viewWidth * 0.5, y ?? this.view.viewHeight * 0.5);
     this.rotation = rotation ?? 0;
     this.zoom = zoom ?? 1;
     this.bgColor = bgColor ?? new Color(0, 0, 0);
-    this.ignoredLayers = ignoredLayers ?? [];
+    this.tag = tag ?? 'default';
+    this.transform = new Mat4();
+    this.screenBounds = new Rectangle();
+    this.viewRect = new Rectangle();
+    this.tempMatrix = new Mat4();
+    this.screenPosition = new Vec2();
     this.updateView(viewX ?? 0, viewY ?? 0, viewWidth ?? 1, viewHeight ?? 1);
   }
 
@@ -240,7 +234,7 @@ export class Camera {
    * @param graphics - The graphics context to draw with.
    * @param drawFunc - The function that performs the drawing operations.
    */
-  drawContent(graphics: Graphics, drawFunc: (graphics: Graphics) => void): void {
+  drawContent(graphics: Graphics, drawFunc: (graphics: Graphics, camera?: Camera) => void): void {
     if (!this.active) {
       return;
     }
@@ -251,7 +245,7 @@ export class Camera {
 
     graphics.pushTransform(this.transform);
     graphics.color.set(1, 1, 1, 1);
-    drawFunc(graphics);
+    drawFunc(graphics, this);
     graphics.commit();
     graphics.popTransform();
     graphics.popTarget();
