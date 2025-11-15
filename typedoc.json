@@ -3,5 +3,5 @@
   "entryPoints": ["packages/*"],
   "name": "Rain",
   "entryPointStrategy": "packages",
-  "includeVersion": false,
+  "includeVersion": false
 }

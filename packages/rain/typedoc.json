@@ -2,5 +2,5 @@
   "$schema": "https://typedoc.org/schema.json",
   "name": "Rain",
   "tsconfig": "./tsconfig.build.json",
-  "includeVersion": true,
+  "includeVersion": true
 }
