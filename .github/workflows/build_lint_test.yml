@@ -46,20 +46,11 @@ jobs:
       - name: Install Dependencies
         run: pnpm install
 
-      - name: Build Rain
-        run: pnpm --filter @rain2d/rain build
+      - name: Build Packages
+        run: pnpm run build-packages
 
-      - name: Test Rain
-        run: pnpm --filter @rain2d/rain test
-
-      - name: Build Rain View
-        run: pnpm --filter @rain2d/view build
-
-      - name: Build Rain Scenes
-        run: pnpm --filter @rain2d/scenes build
-
-      - name: Build Rain Tweening
-        run: pnpm --filter @rain2d/tweening build
+      - name: Test Packages
+        run: pnpm run test-packages
 
 
   build-projects:
@@ -80,15 +71,9 @@ jobs:
       - name: Install Dependencies
         run: pnpm install
 
-      - name: Build @rain2d/rain
-        run: pnpm --filter @rain2d/rain build
-
-      - name: Build @rain2d/view
-        run: pnpm --filter @rain2d/view build
-
-      - name: Build @rain2d/scenes
-        run: pnpm --filter @rain2d/scenes build
+      - name: Build Packages
+        run: pnpm run build-packages
 
       # Bunnies Project
-      - name: Build @rain2d-projects/bunnies
-        run: pnpm --filter @rain2d-projects/bunnies build
+      - name: Build Projects
+        run: pnpm --filter './projects/**' build

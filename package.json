@@ -3,6 +3,8 @@
   "private": true,
   "description": "",
   "scripts": {
+    "build-packages": "pnpm --filter './packages/**' build",
+    "test-packages": "pnpm --filter './packages/**' test",
     "lint": "biome check",
     "typedoc": "typedoc"
   },

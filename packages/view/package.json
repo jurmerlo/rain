@@ -13,8 +13,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
-    "test": "vitest run"
+    "build": "tsc -p tsconfig.build.json"
   },
   "keywords": [],
   "author": "Jurmerlo",
