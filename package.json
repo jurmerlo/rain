@@ -3,13 +3,15 @@
   "private": true,
   "description": "",
   "scripts": {
-    "lint": "biome check"
+    "lint": "biome check",
+    "typedoc": "typedoc"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.20.0",
   "devDependencies": {
-    "@biomejs/biome": "2.3.3"
+    "@biomejs/biome": "2.3.3",
+    "typedoc": "^0.28.14"
   }
 }

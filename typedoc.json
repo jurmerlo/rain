@@ -1,0 +1,7 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["packages/*"],
+  "name": "Rain",
+  "entryPointStrategy": "packages",
+  "includeVersion": false,
+}
