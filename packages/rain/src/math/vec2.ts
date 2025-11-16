@@ -174,10 +174,13 @@ export class Vec2 {
   /**
    * Copy the values from another vector.
    * @param other - The vector to copy from.
+   * @returns The vector.
    */
-  copyFrom(other: Vec2): void {
+  copyFrom(other: Vec2): Vec2 {
     this.x = other.x;
     this.y = other.y;
+
+    return this;
   }
 
   /**

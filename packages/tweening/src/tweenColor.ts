@@ -70,8 +70,8 @@ export class TweenColor {
    * @param ease - Optional easing function (defaults to linear).
    */
   constructor(start: Color, end: Color, duration: number, ease?: Ease) {
-    this.start = start;
-    this.end = end;
+    this.start = start.clone();
+    this.end = end.clone();
     this.tween = new Tween(0, 1, duration, ease);
   }
 
@@ -101,5 +101,12 @@ export class TweenColor {
    */
   setOnComplete(callback: () => void): void {
     this.tween.setOnComplete(callback);
+  }
+
+  /**
+   * Cleans up resources used by the tween.
+   */
+  destroy(): void {
+    this.tween.destroy();
   }
 }

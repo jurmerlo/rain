@@ -102,4 +102,11 @@ export class Tween {
   setOnComplete(callback: () => void): void {
     this.onComplete = callback;
   }
+
+  /**
+   * Cleans up resources used by the tween.
+   */
+  destroy(): void {
+    this.onComplete = undefined;
+  }
 }

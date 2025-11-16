@@ -70,8 +70,8 @@ export class TweenVec2 {
    * @param ease - Optional easing function (defaults to linear).
    */
   constructor(start: Vec2, end: Vec2, duration: number, ease?: Ease) {
-    this.start = start;
-    this.end = end;
+    this.start = start.clone();
+    this.end = end.clone();
     this.tween = new Tween(0, 1, duration, ease);
   }
 
@@ -108,5 +108,11 @@ export class TweenVec2 {
    */
   setOnComplete(callback: () => void): void {
     this.tween.setOnComplete(callback);
+  }
+
+  destroy(): void {
+    this.tween.destroy();
+    Vec2.put(this.start);
+    Vec2.put(this.end);
   }
 }
