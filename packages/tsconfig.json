@@ -1,0 +1,17 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./packages/rain"
+    },
+    {
+      "path": "./packages/scenes"
+    },
+    {
+      "path": "./packages/tweening"
+    },
+    {
+      "path": "./packages/view"
+    }
+  ]
+}

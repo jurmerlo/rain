@@ -1,6 +1,7 @@
 packages:
   - packages/*
   - projects/*
+  - tools/*
   - testing/rain/*
   - testing/scenes/*
   - testing/tweening/*
