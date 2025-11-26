@@ -1,13 +1,13 @@
 {
-  "name": "@rain2d/spritetlas",
+  "name": "@rain2d/spriteatlas",
   "version": "1.0.0",
-  "description": "A spritetlas generator and tileset extruder for Rain engine",
+  "description": "A spriteatlas generator and tileset extruder for Rain engine",
   "type": "module",
   "files": [
     "dist"
   ],
   "bin": {
-    "spritetlas": "./dist/cli/index.js"
+    "spriteatlas": "./dist/cli/index.js"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
