@@ -1,0 +1,32 @@
+{
+  "name": "@rain2d/spritetlas",
+  "version": "1.0.0",
+  "description": "A spritetlas generator and tileset extruder for Rain engine",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "bin": {
+    "spritetlas": "./dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "biome check",
+    "test": "vitest run"
+  },
+  "keywords": [],
+  "author": "Jurmerlo",
+  "license": "ISC",
+  "packageManager": "pnpm@10.20.0",
+  "dependencies": {
+    "@ltd/j-toml": "^1.38.0",
+    "commander": "^14.0.2",
+    "pngjs": "^7.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "@types/pngjs": "^6.0.5",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

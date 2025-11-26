@@ -24,6 +24,13 @@ export class Random {
   }
 
   /**
+   * The current seed value. Useful for saving/restoring state.
+   */
+  get currentSeed(): number {
+    return this.internalSeed;
+  }
+
+  /**
    * The seed for the next random number.
    */
   private internalSeed = 1.0;
