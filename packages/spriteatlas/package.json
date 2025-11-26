@@ -7,7 +7,7 @@
     "dist"
   ],
   "bin": {
-    "spriteatlas": "./dist/cli/index.js"
+    "spriteatlas": "./dist/index.js"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
