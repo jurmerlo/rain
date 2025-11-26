@@ -80,15 +80,20 @@ export function saveJsonData(name: string, saveFolder: string, atlas: Atlas): vo
         frame: {
           x: rect.x + Number(image.extrude),
           y: rect.y + Number(image.extrude),
-          width: rect.width - Number(image.extrude) * 2,
-          height: rect.height - Number(image.extrude) * 2,
+          w: rect.width - Number(image.extrude) * 2,
+          h: rect.height - Number(image.extrude) * 2,
         },
+        rotated: false,
         trimmed: image.trimmed,
         sourceSize: {
+          w: image.sourceWidth,
+          h: image.sourceHeight,
+        },
+        spriteSourceSize: {
           x: image.sourceX,
           y: image.sourceY,
-          width: image.sourceWidth,
-          height: image.sourceHeight,
+          w: rect.width - Number(image.extrude) * 2,
+          h: rect.height - Number(image.extrude) * 2,
         },
       });
     }
