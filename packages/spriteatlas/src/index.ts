@@ -182,7 +182,7 @@ packMethod = "optimal"
 [[tilesets]]
 name = "tiles"
 saveFolder = "assets"
-file = "tileset.png"
+sourceImage = "tiles.png"
 tileWidth = 32
 tileHeight = 32
 extrude = 1
